@@ -1,18 +1,19 @@
 import requests
 
-token:str = '' # completar con el token de la API
+TOKEN:str = '' # completar con el token de la API
+AUTHORIZATION:str = 'Bearer ' + TOKEN
+URL:str = 'http://vps-3701198-x.dattaweb.com:4000'
 
-def getCinemas(token:str) -> dict:
+def get_cinemas(token:str) -> dict:
     
     '''
     Obtener información de todos los cines.
     '''
     
-    url:str = 'http://vps-3701198-x.dattaweb.com:4000/cinemas'
-    authorization:str = "Bearer " + token
+    endpoint:str = f'{URL}/cinemas'
     
     try:
-        response = requests.get(url, headers={'Authorization': authorization })
+        response = requests.get(endpoint, headers={'Authorization': AUTHORIZATION })
         response.raise_for_status()
         
         cinemas:dict = response.json()
@@ -22,21 +23,20 @@ def getCinemas(token:str) -> dict:
         raise SystemExit('ERROR: ' + str(err))
 
 
-def getMoviesByCinema(token:str, cinemaId:int) -> dict:
+def get_movies_by_cinema(token:str, cinema_id:int) -> dict:
     
     '''
     Obtener películas proyectadas en un determinado cine.
     '''
     
-    url:str = 'http://vps-3701198-x.dattaweb.com:4000/cinemas/' + str(cinemaId) + '/movies'
-    authorization:str = "Bearer " + token
+    endpoint:str = f'{URL}/cinemas/{cinema_id}/movies'
     
     try:
-        response = requests.get(url, headers={'Authorization': authorization })
+        response = requests.get(endpoint, headers={'Authorization': AUTHORIZATION })
         response.raise_for_status()
     
-        moviesByCinema:dict = response.json()
-        return moviesByCinema
+        movies_by_cinema:dict = response.json()
+        return movies_by_cinema
     
     except requests.exceptions.HTTPError as err:
         raise SystemExit('ERROR: ' + str(err))
