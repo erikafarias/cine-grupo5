@@ -1,19 +1,19 @@
 import tkinter as tk
 
 
-def pantallaSecundaria(sala:dict, pelicula:dict) -> None:
+def pantalla_secundaria(sala:dict, pelicula:dict) -> None:
     
     window = tk.Tk(screenName='Pantalla Secundaria')
     
     window.title('PANTALLA SECUNDARIA')
 
-    label_text = ' GRUPO 5 - Cines '
+    titulo_texto = ' GRUPO 5 - Cines '
    
-    texto1 = tk.Label(window, text = label_text, font = ("Trebuchet MS", 24, "bold"), bg = 'pink', fg = 'white')
-    texto1.pack()
+    titulo = tk.Label(window, text = titulo_texto, font = ("Trebuchet MS", 24, "bold"), bg = 'pink', fg = 'white')
+    titulo.pack()
     
-    botonPP = tk.Button(window, text=">> Volver a pantalla principal", command='Aca iria la funcion de pantalla principal')
-    botonPP.configure(
+    boton_pantalla_principal = tk.Button(window, text=">> Volver a pantalla principal", command='Aca iria la funcion de pantalla principal')
+    boton_pantalla_principal.configure(
         relief=tk.RAISED,
         bd=3,
         font=('Trebuchet MS', 7, 'bold'),
@@ -22,59 +22,59 @@ def pantallaSecundaria(sala:dict, pelicula:dict) -> None:
         padx=10,
         pady=5,
     )
-    botonPP.pack(pady=20)
+    boton_pantalla_principal.pack(pady=20)
     
-    mostrarSala(sala, window)
-    mostrarPelicula(pelicula, window)
-    mostrarBotonReserva(sala, window)
+    mostrar_sala(sala, window)
+    mostrar_pelicula(pelicula, window)
+    mostrar_boton_reserva(sala, window)
 
     window.mainloop()
     
     
-def mostrarSala(sala:dict, window:tk) -> None:
+def mostrar_sala(sala:dict, window:tk) -> None:
     
-    cine_text = "- " + sala['location'] + " -"
-    cine = tk.Label(window, text = cine_text, font = ('Trebuchet MS', 15), fg = 'pink')
+    cine_texto = "- " + sala['location'] + " -"
+    cine = tk.Label(window, text = cine_texto, font = ('Trebuchet MS', 15), fg = 'pink')
     cine.pack(pady=10)
     
-    asientos_text = "Asientos disponibles: " + str(sala['available_seats'])
-    asientos = tk.Label(window, text = asientos_text, font = ('Trebuchet MS', 8, 'italic'), fg = 'black')
+    asientos_texto = "Asientos disponibles: " + str(sala['available_seats'])
+    asientos = tk.Label(window, text = asientos_texto, font = ('Trebuchet MS', 8, 'italic'), fg = 'black')
     asientos.pack()
     
     
-def mostrarPelicula(pelicula:dict, window:tk) -> None:
+def mostrar_pelicula(pelicula:dict, window:tk) -> None:
     
-    titulo_text = pelicula['name']
-    titulo = tk.Label(window, text = titulo_text, font = ('Trebuchet MS', 10), fg = 'black')
-    titulo.pack(pady=20)
+    nombre_pelicula_texto = pelicula['name']
+    nombre_pelicula = tk.Label(window, text = nombre_pelicula_texto, font = ('Trebuchet MS', 10), fg = 'black')
+    nombre_pelicula.pack(pady=20)
     
-    sinopsis_text = pelicula['synopsis']
-    sinopsis = tk.Label(window, text = sinopsis_text, font = ('Trebuchet MS', 10, 'italic'), fg = 'black')
+    sinopsis_texto = pelicula['synopsis']
+    sinopsis = tk.Label(window, text = sinopsis_texto, font = ('Trebuchet MS', 10, 'italic'), fg = 'black')
     sinopsis.pack()
     
-    duracion_text = pelicula['duration']
-    duracion = tk.Label(window, text = duracion_text, font = ('Trebuchet MS', 10), fg = 'black')
+    duracion_texto = pelicula['duration']
+    duracion = tk.Label(window, text = duracion_texto, font = ('Trebuchet MS', 10), fg = 'black')
     duracion.pack()
     
-    actores_text = pelicula['actors']
-    actores = tk.Label(window, text = actores_text, font = ('Trebuchet MS', 10), fg = 'black')
+    actores_texto = pelicula['actors']
+    actores = tk.Label(window, text = actores_texto, font = ('Trebuchet MS', 10), fg = 'black')
     actores.pack()
     
-    genero_text = pelicula['gender']
-    genero = tk.Label(window, text = genero_text, font = ('Trebuchet MS', 10, 'bold'), fg = 'black')
+    genero_texto = pelicula['gender']
+    genero = tk.Label(window, text = genero_texto, font = ('Trebuchet MS', 10, 'bold'), fg = 'black')
     genero.pack()
     
-    rating_text = pelicula['rating']
-    rating = tk.Label(window, text = rating_text, font = ('Trebuchet MS', 10, 'bold'), fg = 'black')
+    rating_texto = pelicula['rating']
+    rating = tk.Label(window, text = rating_texto, font = ('Trebuchet MS', 10, 'bold'), fg = 'black')
     rating.pack()
     
 
-def mostrarBotonReserva(sala:dict, window:tk) -> None:
+def mostrar_boton_reserva(sala:dict, window:tk) -> None:
     
     if sala['available_seats'] > 0:
     
-        botonR = tk.Button(window, text="RESERVAR", command='Aca iria la funcion de pantalla de reserva')
-        botonR.configure(
+        boton_reserva = tk.Button(window, text="RESERVAR", command='Aca iria la funcion de pantalla de reserva')
+        boton_reserva.configure(
             relief=tk.RAISED,
             bd=3,
             font=('Trebuchet MS', 13, 'bold'),
@@ -83,12 +83,12 @@ def mostrarBotonReserva(sala:dict, window:tk) -> None:
             padx=10,
             pady=15,
         )
-        botonR.pack(pady=40)
+        boton_reserva.pack(pady=40)
         
     else:
         
-        label_text = 'SALA LLENA - sin asientos disponibles.'
-        label = tk.Label(window, text = label_text, font = ('Trebuchet MS', 13), fg = 'black', background='red', foreground='white')
+        label_texto = 'SALA LLENA - sin asientos disponibles.'
+        label = tk.Label(window, text = label_texto, font = ('Trebuchet MS', 13), fg = 'black', background='red', foreground='white')
         label.pack(pady=40)
 
 # la info de la sala se obtendria del endpoint GET /movies/{movie_id}/cinemas
@@ -112,4 +112,4 @@ pelicula:dict = {
     "rating" : "+13"
 }
 
-pantallaSecundaria(sala, pelicula)
+pantalla_secundaria(sala, pelicula)
