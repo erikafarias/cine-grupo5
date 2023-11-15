@@ -81,5 +81,26 @@ def get_movies_by_cinema(cinema_id:int) -> list[dict]:
     
     except requests.exceptions.HTTPError as err:
         raise SystemExit('ERROR: ' + str(err))
-        
+
+
+    def stock_snacks() -> tuple[list, list]:
+
+        '''
+        Los nombres y los precios por separado
+        '''
+
+        endpoint: str = f'{URL}/snacks'
+        response = requests.get(endpoint, headers=AUTH)
+        response.raise_for_status()
+
+        stock_of_snacks: [dict] = response.json()
+        list_names_snacks: list = []
+        for elemento in stock_of_snacks:
+            list_names_snacks.append(elemento)
+
+        list_prices_snacks: list = []
+        for elemento in list_names_snacks:
+            list_prices_snacks.append(stock_of_snacks[elemento])
+
+        return list_names_snacks, list_prices_snacks
         
