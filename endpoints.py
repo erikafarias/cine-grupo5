@@ -83,7 +83,7 @@ def get_movies_by_cinema(cinema_id:int) -> list[dict]:
         raise SystemExit('ERROR: ' + str(err))
 
 
-    def stock_snacks() -> tuple[list, list]:
+def stock_snacks() -> tuple[list, list]:
 
         '''
         Los nombres y los precios por separado
