@@ -44,7 +44,11 @@ def get_cinemas_by_movie_id(id: int) -> list[str]:
         print(f'Ocurrió un error: {err}. Código: {response.status_code}')
     return cinemas
 
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> main
 def get_cinemas() -> list[dict]:
     
     '''
@@ -97,4 +101,26 @@ def get_cinema_info_by_id(cinema_id:int) -> dict:
         
         if cinema["cinema_id"] == str(cinema_id):
             return cinema
+
+
+def stock_snacks() -> tuple[list, list]:
+
+        '''
+        Los nombres y los precios por separado
+        '''
+
+        endpoint: str = f'{URL}/snacks'
+        response = requests.get(endpoint, headers=AUTH)
+        response.raise_for_status()
+
+        stock_of_snacks: [dict] = response.json()
+        list_names_snacks: list = []
+        for elemento in stock_of_snacks:
+            list_names_snacks.append(elemento)
+
+        list_prices_snacks: list = []
+        for elemento in list_names_snacks:
+            list_prices_snacks.append(stock_of_snacks[elemento])
+
+        return list_names_snacks, list_prices_snacks
         
