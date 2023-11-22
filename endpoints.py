@@ -19,7 +19,7 @@ def get_movies() -> list[dict]:
     return movies
 
 
-def get_movie_by_id(id: int) -> dict:
+def get_movie_by_id(id: str) -> dict:
     movie: dict = {}
     try:
         endpoint_url: str = f'{URL}/movies/{id}'
@@ -32,7 +32,18 @@ def get_movie_by_id(id: int) -> dict:
     return movie
 
 
-def get_cinemas_by_movie_id(id: int) -> list[str]:
+def get_movie_poster(poster_id: str) -> str:
+    
+    try:
+        endpoint_url: str = f'{URL}/posters/{poster_id}'
+        response = requests.get(endpoint_url, headers=AUTH)
+
+        return response.json()['poster_image']
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit('ERROR: ' + str(err))
+
+
+def get_cinemas_by_movie_id(id: str) -> list[str]:
     cinemas: list[str] = []
     try:
         endpoint_url: str = f'{URL}/movies/{id}/cinemas'
@@ -44,11 +55,7 @@ def get_cinemas_by_movie_id(id: int) -> list[str]:
         print(f'Ocurrió un error: {err}. Código: {response.status_code}')
     return cinemas
 
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> main
 def get_cinemas() -> list[dict]:
     
     '''
@@ -68,7 +75,7 @@ def get_cinemas() -> list[dict]:
         raise SystemExit('ERROR: ' + str(err))
 
 
-def get_movies_by_cinema(cinema_id:int) -> list[dict]:
+def get_movies_by_cinema(cinema_id: str) -> list[dict]:
     
     '''
     Obtener películas proyectadas en un determinado cine.
@@ -87,7 +94,7 @@ def get_movies_by_cinema(cinema_id:int) -> list[dict]:
         raise SystemExit('ERROR: ' + str(err))
 
 
-def get_cinema_info_by_id(cinema_id:int) -> dict:
+def get_cinema_info_by_id(cinema_id: str) -> dict:
     
     '''
     
@@ -123,4 +130,4 @@ def stock_snacks() -> tuple[list, list]:
             list_prices_snacks.append(stock_of_snacks[elemento])
 
         return list_names_snacks, list_prices_snacks
-        
+
