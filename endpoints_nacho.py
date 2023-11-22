@@ -1,19 +1,28 @@
-import requests
+def stock_snacks() -> tuple[list, list, list, dict]:
 
-url: str = "http://vps-3701198-x.dattaweb.com:4000"
-token: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.DGI_v9bwNm_kSrC-CQSb3dBFzxOlrtBDHcEGXvCFqgU"
-authorization: dict = {'Authorization': f'Bearer {token}'}
+        '''
+        Los nombres y los precios por separado
+        '''
 
+        endpoint: str = f'{URL}/snacks'
+        response = requests.get(endpoint, headers=AUTH)
+        response.raise_for_status()
 
-def stock_snacks() -> list:
-    ''''
-    Post: Devuelve una lista de diccionarios con cada snack disponible (Stock infinito)
-    '''
+        stock_of_snacks: [dict] = response.json()
+        list_names_snacks: list = []
+        for elemento in stock_of_snacks:
+            list_names_snacks.append(elemento)
 
-    endpoint: str = f'{url}/snacks'
-    response = requests.get(endpoint, headers=authorization)
-    response.raise_for_status()
+        list_prices_snacks: list = []
+        for elemento in list_names_snacks:
+            list_prices_snacks.append(stock_of_snacks[elemento])
 
-    stock_of_snacks: list[dict] = response.json()
+        list_ult:list = []
+        n:int = 0
 
-    return stock_of_snacks
+        for element in list_names_snacks:
+            text: str = f"{element} >> ${list_prices_snacks[n]}"
+            n+=1
+            list_ult.append(text)
+
+        return list_names_snacks, list_prices_snacks, list_ult, stock_of_snacks
