@@ -1,0 +1,103 @@
+import tkinter as tk
+import endpoints
+
+
+def pantalla_checkout(venta:dict) -> None:
+    
+    total:float = 0.0
+    total_entradas:float = 0.0
+    total_snacks:float = 0.0
+    
+    window = tk.Tk(screenName='Pantalla Checkout')
+    window.geometry("1280x720")
+    window.configure(bg= '#2B2A33')
+    window.title('>>> CHECKOUT')
+    
+    # Titulo
+    titulo_texto = ' 🛒 '
+    titulo = tk.Label(window, text = titulo_texto, font = ("Calibri", 50, "bold"), bg= '#2B2A33', fg = 'white', anchor='center')
+    titulo.pack(pady = 15)   
+    titulo_texto2 = ' RESUMEN DE COMPRA '
+    titulo2 = tk.Label(window, text = titulo_texto2, font = ("Calibri", 30, "bold"), bg= '#2B2A33', fg = 'white', anchor='center')
+    titulo2.pack(pady = 15)
+    
+    canvas = tk.Canvas(window, bg= '#2B2A33', highlightbackground = '#2B2A33')
+    canvas.pack(fill=tk.BOTH, padx=60, pady=30)
+    
+    # Entradas
+    entradas_canvas = tk.Canvas(canvas, bg= '#2B2A33', highlightthickness = 3)
+    entradas_canvas.pack(side=tk.LEFT, expand=1, fill=tk.BOTH, pady=15)
+    
+    titulo_entradas_texto = ' ENTRADAS '
+    titulo_entradas = tk.Label(entradas_canvas, text = titulo_entradas_texto, font = ("Calibri", 20, "bold"), bg = 'white', fg = 'black', anchor='center')
+    titulo_entradas.pack(pady = 20)   
+    titulo_pelicula_texto = venta['entradas'][0]
+    titulo_pelicula = tk.Label(entradas_canvas, text = titulo_pelicula_texto, font = ("Calibri", 15, "bold"), bg= '#2B2A33', fg = 'white', anchor='center')
+    titulo_pelicula.pack(pady = 5)
+    titulo_cantidad_entradas_texto = "- Entradas: " + str(venta['entradas'][2])
+    titulo_cantidad_entradas = tk.Label(entradas_canvas, text = titulo_cantidad_entradas_texto, font = ("Calibri", 10), bg= '#2B2A33', fg = 'white', anchor='center')
+    titulo_cantidad_entradas.pack(pady = 5)   
+    titulo_entradas_precio_texto = "- Precio Unitario: $" + str(venta['entradas'][1])
+    titulo_entradas_precio = tk.Label(entradas_canvas, text = titulo_entradas_precio_texto, font = ("Calibri", 10), bg= '#2B2A33', fg = 'white', anchor='center')
+    titulo_entradas_precio.pack(pady = 5)   
+    
+    total_entradas = venta['entradas'][1]*venta['entradas'][2]
+    
+    titulo_entradas_total_texto = "TOTAL ENTRADAS: $" + str(total_entradas)
+    titulo_entradas_total = tk.Label(entradas_canvas, text = titulo_entradas_total_texto, font = ("Calibri", 12, "bold"), bg = 'black', fg = 'white', anchor='center')
+    titulo_entradas_total.pack(pady = (10, 25))  
+    
+    # Snacks
+    snacks_canvas = tk.Canvas(canvas, bg= '#2B2A33', highlightthickness = 3)
+    snacks_canvas.pack(side=tk.RIGHT, expand=1, fill=tk.BOTH, pady=15)
+    
+    titulo_snacks_texto = ' SNACKS '
+    titulo_snacks = tk.Label(snacks_canvas, text = titulo_snacks_texto, font = ("Calibri", 20, "bold"), bg = 'white', fg = 'black', anchor='center')
+    titulo_snacks.pack(pady = 20)
+    
+    for snack in venta['snack']:
+        titulo_snack_nombre_texto = "+ " + snack[0]
+        titulo_snack_nombre = tk.Label(snacks_canvas, text = titulo_snack_nombre_texto, font = ("Calibri", 15, "bold"), bg= '#2B2A33', fg = 'white', anchor='center')
+        titulo_snack_nombre.pack(pady = 10)
+        titulo_cantidad_snack_texto = "Cantidad: " + str(snack[2])
+        titulo_cantidad_snack = tk.Label(snacks_canvas, text = titulo_cantidad_snack_texto, font = ("Calibri", 10), bg= '#2B2A33', fg = 'white', anchor='center')
+        titulo_cantidad_snack.pack(pady = 5)   
+        titulo_snack_precio_texto = "Precio: $" + str(snack[1]*snack[2])
+        titulo_snack_precio = tk.Label(snacks_canvas, text = titulo_snack_precio_texto, font = ("Calibri", 10), bg= '#2B2A33', fg = 'white', anchor='center')
+        titulo_snack_precio.pack(pady = 5)
+        
+        total_snacks += snack[1]*snack[2]
+
+    
+    titulo_snacks_total_texto = "TOTAL SNACKS: $" + str(total_snacks)
+    titulo_snacks_total = tk.Label(snacks_canvas, text = titulo_snacks_total_texto, font = ("Calibri", 12, "bold"), bg = 'black', fg = 'white', anchor='center')
+    titulo_snacks_total.pack(pady = (10, 25))  
+    
+    # Total
+    total = total_entradas + total_snacks
+    
+    titulo_total_texto = ' TOTAL: $' + str(total)
+    titulo_total = tk.Label(window, text = titulo_total_texto, font = ("Calibri", 25, "bold"), bg = 'black', fg = 'white', anchor='center')
+    titulo_total.pack(pady = 30)  
+    
+    boton_pagar = tk.Button(window, text="PAGAR", command='Aca iria la funcion para crear el QR')
+    boton_pagar.configure(
+        relief=tk.RAISED,
+        bd=3,
+        font=('Calibri', 15, 'bold'),
+        foreground='white',
+        background='grey',
+        padx=20,
+        pady=5,
+    )
+    boton_pagar.pack(pady = 15)
+    
+    window.mainloop()
+
+
+venta:dict = {
+    'entradas' : [ 'Mago de Oz', 1000, 2],
+    'snack' : [ [ 'papitas', 500, 1], [ 'coca', 1500, 2], [ 'pochoclos', 500, 2] ]
+}
+
+pantalla_checkout(venta)
