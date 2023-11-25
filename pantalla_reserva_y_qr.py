@@ -5,7 +5,7 @@ import datetime
 import locale
 import random
 import qrcode
-
+from tkinter import messagebox
 
 def price_per_ticket(current_value, price, final_price_ticket, text_value=None):
     number: int = current_value.get()
@@ -56,7 +56,7 @@ def ticket_confirm(dict_cart,number_box,price,final_price_ticket):
 
 
 
-def pantalla_reserva1(dict_entre_ventanas) -> dict:
+def pantalla_reserva1(dict_entre_ventanas) -> None:
     window1 = tkinter.Tk()
     window1.geometry("1280x720")
     window1.resizable(False, False)
@@ -65,7 +65,7 @@ def pantalla_reserva1(dict_entre_ventanas) -> dict:
     font_type = 'Calibri'
 
 
-    price: float = 3000.00  # puse un precio cualquiera, depende de la pelicula en realidad
+    price = float(dict_entre_ventanas['precio_entrada'])
     list_names_snacks, list_prices_snacks, list_ult, stock_of_snacks = stock_snacks()
     final = []
     dict_cart: dict = {}
@@ -223,39 +223,44 @@ def pantalla_reserva1(dict_entre_ventanas) -> dict:
     final_button = tkinter.Button(
         window1,
         font=(font_type, 18),
-        text= "Pagar/Añadir metodo de pago",
-        command= lambda:pantalla_reserva2(dict_cart,dict_entre_ventanas,window1)
+        text= "Checkout/Pagar",
+        command= lambda:pantalla_pagar_final(dict_cart,dict_entre_ventanas,window1,list_names_snacks)
         )
-    final_button.place(x=460, y=600)
+    final_button.place(x=550, y=600)
 
     window1.mainloop()
 
-    return dict_cart # quitar
 
+def button_pay(dict_entre_ventanas,window2,dict_qr,card_number_input,expiry_input,security_code_input):
 
-def button_pay(dict_entre_ventanas,window2):
+    card_number = str(card_number_input.get())
+    expiry = str(expiry_input.get())
+    security_code = str(security_code_input.get())
 
-    locale.setlocale(locale.LC_ALL, '')
-    fecha_actual = datetime.datetime.now()
-    timestamp_compra = fecha_actual.strftime('%d/%m/%Y %H:%M')
+    if len(card_number) != 19 or len(expiry) != 5 or len(security_code) != 3:
 
-    dict_entre_ventanas['timestamp_compra'] = timestamp_compra
+        messagebox.showinfo(message="Verifique los datos de su tarjeta", title="Error en los datos")
 
-    id_qr = random.randint(1000, 9999)
+    else:
+        locale.setlocale(locale.LC_ALL, '')
+        fecha_actual = datetime.datetime.now()
+        timestamp_compra = fecha_actual.strftime('%d/%m/%Y %H:%M')
 
-    dict_entre_ventanas['ID_QR'] = id_qr
-    
-    string_qr: str = ''
-    for key in dict_entre_ventanas:
-        string_qr += f'{str(dict_entre_ventanas[key])}; '
+        dict_entre_ventanas['timestamp_compra'] = timestamp_compra
 
-    img = qrcode.make(string_qr)
-    type(img)
-    img.save("QR_GENERADO.png")
+        id_qr = random.randint(1000, 9999)
 
-    window2.withdraw() # cierra la segunda ventana
+        dict_entre_ventanas['ID_QR'] = id_qr
+        
+        string_qr = f'{id_qr}; {dict_entre_ventanas["pelicula"]}; {dict_entre_ventanas["ubicación_totem"]}; {dict_entre_ventanas["cantidad_entradas"]}; {dict_entre_ventanas["timestamp_compra"]}'
 
-def pantalla_reserva2(dict_cart,dict_entre_ventanas,window1):
+        img = qrcode.make(string_qr)
+        type(img)
+        img.save("QR_GENERADO.png")
+
+        window2.withdraw() # cierra esta ventana
+
+def pantalla_pagar_final(dict_cart,dict_entre_ventanas,window1,list_names_snacks):
 
     window1.withdraw() # cierra la primera ventana
 
@@ -267,20 +272,9 @@ def pantalla_reserva2(dict_cart,dict_entre_ventanas,window1):
 
     font_type = 'Calibri'
 
-    dict_entre_ventanas['cantidad_entradas'] = dict_cart['Asientos'][0]
-
-    # boton de pago
-    pay_button = tkinter.Button(
-        window2, text='Pagar',
-         font=(font_type,18),
-         command= lambda:button_pay(dict_entre_ventanas,window2),
-         )
-    pay_button.place(x=190,y= 400)
-
-
     # metodos de pago
     payment_methods_label = tkinter.Label(window2,text='Metodos de pago',font=(font_type,18),bg='#2b2a33',fg='#ffffff')
-    payment_methods_label.place(x=170,y=50)
+    payment_methods_label.place(x=160,y=50)
 
     payment_methods_list: list = ['Visa','Amex','MasteCard','Naranja','Cabal']
     current_var = tkinter.StringVar()
@@ -298,17 +292,35 @@ def pantalla_reserva2(dict_cart,dict_entre_ventanas,window1):
     # inputs numero y codigo de seguridad de la tajeta
 
     card_number_label = tkinter.Label(window2, text="Numero de tarjeta",bg='#2b2a33',fg='#ffffff',font=(font_type,18))    
-    card_number_label.place(x=170,y=150)
+    card_number_label.place(x=160,y=150)
 
-    card_number_input = tkinter.Entry(window2,width=20,font=(font_type,15))
+    card_number_input = tkinter.Entry(window2,width=18,font=(font_type,13))
     card_number_input.place(x=170,y=200)
+    card_number_input.insert(0,"0000-0000-0000-0000")
+    
+    security_code_label = tkinter.Label(window2, text="Codigo de seguridad",bg='#2b2a33',fg='#ffffff',font=(font_type,15))
+    security_code_label.place(x=50,y=250)
+    
+    security_code_input = tkinter.Entry(window2,width=3, font=(font_type,13))
+    security_code_input.place(x=100,y=300)
+    security_code_input.insert(0,"***")
 
-    security_code_label = tkinter.Label(window2, text="Codigo de seguridad",bg='#2b2a33',fg='#ffffff',font=(font_type,18))
-    security_code_label.place(x=170,y=250)
+    expiry_label = tkinter.Label(window2, text='Fecha de vencimiento',bg='#2b2a33',fg='#ffffff',font=(font_type,15))
+    expiry_label.place(x=300, y=250)
 
-    security_code_input = tkinter.Entry(window2,width=20, font=(font_type,15))
-    security_code_input.place(x=170,y=300)
+    expiry_input = tkinter.Entry(window2, width=7, font=(font_type,13))
+    expiry_input.place(x=350, y=300)
+    expiry_input.insert(0,"MM/AA")
 
+
+    # boton de pago
+    dict_qr: dict = {} #diccio solo para generar el qr
+    pay_button = tkinter.Button(
+        window2, text='Pagar',
+         font=(font_type,18),
+         command= lambda:button_pay(dict_entre_ventanas,window2,dict_qr,card_number_input,expiry_input,security_code_input),
+         )
+    pay_button.place(x=210,y= 400)
 
     window2.mainloop()
 
@@ -317,13 +329,30 @@ def main():  # ignorar
 
     dict_entre_ventanas: dict = {
     'ID_QR':'id generado aleatorio',
-    'pelicula': 'nombre pelicula',
-    'ubicación_totem':'ubicacion del cine',
+    'pelicula': 'When evil lurks',
+    'ubicación_totem':'Abasto',
     'cantidad_entradas': 0,
+    'precio_entrada': 3000, # c/u
+    'snacks': [],
     'timestamp_compra': 'hora de la compra'
     }
 
-    print(pantalla_reserva1(dict_entre_ventanas))
+    pantalla_reserva1(dict_entre_ventanas)
     
 
 main()
+
+""" para el 
+    
+    checkout(dict_cart,dict_entre_ventanas,window1,list_names_snacks):
+
+        window1.withdraw() # cierra la ventana de reserva
+
+        dict_entre_ventanas['cantidad_entradas'] = dict_cart['Asientos'][0]
+
+        for snack in list_names_snacks:
+            if snack in dict_cart:
+                dict_entre_ventanas['snacks'] += (snack,dict_cart[snack][0],dict_cart[snack][1])
+
+
+ """
