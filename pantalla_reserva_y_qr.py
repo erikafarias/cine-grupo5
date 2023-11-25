@@ -237,7 +237,7 @@ def button_pay(dict_entre_ventanas,window2,dict_qr,card_number_input,expiry_inpu
     expiry = str(expiry_input.get())
     security_code = str(security_code_input.get())
 
-    if len(card_number) != 19 or len(expiry) != 5 or len(security_code) != 3:
+    if len(card_number) != 19 or card_number == '0000-0000-0000-0000' or len(expiry) != 5 or expiry == 'MM/AA' or len(security_code) != 3 or security_code == '***':
 
         messagebox.showinfo(message="Verifique los datos de su tarjeta", title="Error en los datos")
 
@@ -248,11 +248,17 @@ def button_pay(dict_entre_ventanas,window2,dict_qr,card_number_input,expiry_inpu
 
         dict_entre_ventanas['timestamp_compra'] = timestamp_compra
 
+        snacks_final = 0
+        for snack in dict_entre_ventanas['snacks']:
+            snacks_final += snack[2]
+
+        final_price_ = (int(dict_entre_ventanas['cantidad_entradas']) * int(dict_entre_ventanas['precio_entrada']) + snacks_final)
+        
         id_qr = random.randint(1000, 9999)
 
         dict_entre_ventanas['ID_QR'] = id_qr
         
-        string_qr = f'{id_qr}; {dict_entre_ventanas["pelicula"]}; {dict_entre_ventanas["ubicación_totem"]}; {dict_entre_ventanas["cantidad_entradas"]}; {dict_entre_ventanas["timestamp_compra"]}'
+        string_qr = f'{id_qr}; {dict_entre_ventanas["pelicula"]}; {dict_entre_ventanas["ubicación_totem"]}; {dict_entre_ventanas["cantidad_entradas"]}; {dict_entre_ventanas["timestamp_compra"]}; {final_price_}'
 
         img = qrcode.make(string_qr)
         type(img)
@@ -352,7 +358,6 @@ main()
 
         for snack in list_names_snacks:
             if snack in dict_cart:
-                dict_entre_ventanas['snacks'] += (snack,dict_cart[snack][0],dict_cart[snack][1])
-
+                dict_entre_ventanas['snacks'] += [[ snack , dict_cart[snack][0] , dict_cart[snack][1] ]]
 
  """
