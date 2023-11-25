@@ -1,0 +1,10 @@
+{
+    "ID_QR": [
+        "ID_QR",
+        "NOMBRE_PELICULA",
+        "UBICACION_TOTEM",
+        "CANTIDAD_ENTRADAS",
+        "DD/MM/AAAA HH:MM",
+        "GASTO_TOTAL"
+    ]
+}

@@ -3,9 +3,10 @@ from tkinter import ttk
 from endpoints import *
 import datetime
 import locale
-import random
+import random, string
 import qrcode
 from tkinter import messagebox
+import json
 
 def price_per_ticket(current_value, price, final_price_ticket, text_value=None):
     number: int = current_value.get()
@@ -246,6 +247,7 @@ def button_pay(dict_entre_ventanas,window2,dict_qr,card_number_input,expiry_inpu
         fecha_actual = datetime.datetime.now()
         timestamp_compra = fecha_actual.strftime('%d/%m/%Y %H:%M')
 
+
         dict_entre_ventanas['timestamp_compra'] = timestamp_compra
 
         snacks_final = 0
@@ -254,7 +256,7 @@ def button_pay(dict_entre_ventanas,window2,dict_qr,card_number_input,expiry_inpu
 
         final_price_ = (int(dict_entre_ventanas['cantidad_entradas']) * int(dict_entre_ventanas['precio_entrada']) + snacks_final)
         
-        id_qr = random.randint(1000, 9999)
+        id_qr = str(random.randint(1000, 9999)) + str(random.choice(string.ascii_letters))
 
         dict_entre_ventanas['ID_QR'] = id_qr
         
@@ -263,6 +265,18 @@ def button_pay(dict_entre_ventanas,window2,dict_qr,card_number_input,expiry_inpu
         img = qrcode.make(string_qr)
         type(img)
         img.save("QR_GENERADO.png")
+
+        dict_ID_QR: dict = {f'{id_qr}': [f'{id_qr}',f'{dict_entre_ventanas["pelicula"]}',f'{dict_entre_ventanas["ubicación_totem"]}',f'{dict_entre_ventanas["cantidad_entradas"]}',f'{dict_entre_ventanas["timestamp_compra"]}',f'{final_price_}']}
+
+        with open('IDs_QR.json', 'r') as file_:
+            data = json.load(file_)
+
+        data.update(dict_ID_QR)
+
+        with open('IDs_QR.json', 'w') as outfile:
+            json.dump(data, outfile, indent= 4)
+
+        messagebox.showinfo(message=f"Tu ID de compra es: {id_qr}", title="ID de compra")
 
         window2.withdraw() # cierra esta ventana
 
