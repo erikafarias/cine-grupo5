@@ -16,7 +16,6 @@ def find_movies_by_cinema(cinema_id: str) -> list[dict]:
     for movie in all_movies:
         if movie['movie_id'] in movies_by_cinema[0]['has_movies']:
             movies.append(movie)
-            print(movie)
 
     return movies
 
@@ -54,7 +53,7 @@ def update_cinema_id(cinema_name: str, cinema_id: tk.StringVar, cinemas_list):
     cinema_id.set(find_cinema_id_by_name(cinemas_list, cinema_name))
 
 
-def find_movie_by_name(movie_name: str, cinema_id: str, movies_canvas: tk.Canvas):
+def find_movie_by_name(movie_name: str, cinema_id: str, movies_canvas: tk.Canvas, entry: tk.Entry):
     movies: list[dict] = find_movies_by_cinema(cinema_id)
     movies_found: list[dict] = []
 
@@ -69,6 +68,8 @@ def find_movie_by_name(movie_name: str, cinema_id: str, movies_canvas: tk.Canvas
         label_no_disponibles.pack(fill='both', pady='10', padx='10', expand=True)
     else:
         show_movies(movies_found, movies_canvas)
+
+    entry.delete(0, tk.END)
 
     return movies_found
 
@@ -86,7 +87,6 @@ def show_movies(movies: list[dict], movies_canvas: tk.Canvas):
 
 
     m: int = 0
-    print(number_of_movies)
 
     for r in range(number_of_rows):
         for c in range(NUMBER_OF_COLUMNS):
@@ -145,7 +145,7 @@ def pantalla_principal():
     input_frame = tk.Frame(master=frame_cinemas_searchbar, bg=bg_color)
     movie_name = tk.StringVar()
     input_entry = tk.Entry(master=input_frame, textvariable=movie_name, font='Calibri 14', bg=bg_color, fg=fg_color)
-    button = tk.Button(master=input_frame, text='Buscar', command=lambda: find_movie_by_name(movie_name.get(), cinema_id.get(), movies_canvas))
+    button = tk.Button(master=input_frame, text='Buscar', command=lambda: find_movie_by_name(movie_name.get(), cinema_id.get(), movies_canvas, input_entry))
     button.configure(font='Calibri 14 bold', bg=bg_color, fg=fg_color, pady=0)
     input_entry.pack(side='left', padx='10')
     button.pack(side='right')
