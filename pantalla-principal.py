@@ -64,7 +64,9 @@ def find_movie_by_name(movie_name: str, cinema_id: str, movies_canvas: tk.Canvas
 
     if len(movies_found) == 0:
         movies_canvas.delete('all')
-        label_no_disponibles = tk.Label(movies_canvas, text=f'No hay películas disponibles que coincidan con su búsqueda: {movie_name}', font='Calibri 18 bold', bg='#2B2A33', fg='#FFFFFF')
+        label_no_disponibles = tk.Label(movies_canvas, text=f'No hay películas disponibles que coincidan con su '
+                                                            f'búsqueda: {movie_name}', font='Calibri 18 bold',
+                                        bg='#2B2A33', fg='#FFFFFF')
         label_no_disponibles.pack(fill='both', pady='10', padx='10', expand=True)
     else:
         show_movies(movies_found, movies_canvas)
@@ -76,31 +78,31 @@ def find_movie_by_name(movie_name: str, cinema_id: str, movies_canvas: tk.Canvas
 
 def show_movies(movies: list[dict], movies_canvas: tk.Canvas):
     number_of_movies: int = len(movies)
-    number_of_rows: int = round(number_of_movies / 4) + 1
     NUMBER_OF_COLUMNS: int = 4
+    number_of_rows: int = round(number_of_movies / NUMBER_OF_COLUMNS) + 1
 
     movies_canvas.delete('all')
 
-    movies_frame = tk.Frame(movies_canvas, bg='#2B2A33')
+    movies_frame = tk.Frame(movies_canvas, bg='#2B2A33', highlightbackground='#2B2A33')
     movies_frame.pack(fill='both')
     movies_canvas.create_window((0, 0), window=movies_frame, anchor='nw')
-
 
     m: int = 0
 
     for r in range(number_of_rows):
         for c in range(NUMBER_OF_COLUMNS):
             if m < number_of_movies:
-                frame_movie = tk.Frame(movies_frame,bg='#2B2A33')
+                frame_movie = tk.Frame(movies_frame, bg='#2B2A33')
                 frame_movie.grid(row=r, column=c, padx=10, pady=10)
                 poster_base64_movie = find_poster(movies[m]['poster_id'])
                 poster_movie = ImageTk.PhotoImage(decodificar_imagen_base64(poster_base64_movie))
 
                 button_movie = tk.Button(frame_movie, image=poster_movie, bg='#2B2A33')
-                button_movie.image = poster_movie # to prevent garbage collection
+                button_movie.image = poster_movie  # to prevent garbage collection
                 button_movie.grid(row=0, column=0)
 
-                label_movie = tk.Label(frame_movie, text=movies[m]['name'], font='Calibri 14', bg='#2B2A33', fg='#FFFFFF')
+                label_movie = tk.Label(frame_movie, text=movies[m]['name'], font='Calibri 14', bg='#2B2A33',
+                                       fg='#FFFFFF')
                 label_movie.grid(row=1, column=0)
 
                 m += 1
@@ -135,17 +137,19 @@ def pantalla_principal():
     selected_cinema.trace_add('write', lambda *args: update_cinema_id(selected_cinema.get(), cinema_id, cinemas_list))
     select_cinema = tk.OptionMenu(frame_option_menu, selected_cinema, *cinemas_names,
                                   command=lambda event: change_cinema(cinema_id.get(), movies_canvas))
-    select_cinema.config(font='Calibri 16 bold', bg=bg_color, fg=fg_color, width='50')
+    select_cinema.config(font='Calibri 16 bold', bg=bg_color, fg=fg_color, width='50', highlightbackground=bg_color)
     select_cinema['menu'].config(font='Calibri 16', bg='#302F39', fg=fg_color)
     select_cinema.pack()
     frame_option_menu.pack(side='left')
 
     # search bar
-    input_frame = tk.Frame(master=frame_cinemas_searchbar, bg=bg_color)
+    input_frame = tk.Frame(master=frame_cinemas_searchbar, bg=bg_color, highlightbackground=bg_color)
     movie_name = tk.StringVar()
     input_entry = tk.Entry(master=input_frame, textvariable=movie_name, font='Calibri 14', bg=bg_color, fg=fg_color)
-    button = tk.Button(master=input_frame, text='Buscar', command=lambda: find_movie_by_name(movie_name.get(), cinema_id.get(), movies_canvas, input_entry))
-    button.configure(font='Calibri 14 bold', bg=bg_color, fg=fg_color, pady=0)
+    button = tk.Button(master=input_frame, text='Buscar',
+                       command=lambda: find_movie_by_name(movie_name.get(), cinema_id.get(), movies_canvas,
+                                                          input_entry))
+    button.configure(font='Calibri 14 bold', bg=bg_color, fg=fg_color, pady=0, highlightbackground=bg_color)
     input_entry.pack(side='left', padx='10')
     button.pack(side='right')
     input_frame.pack(side='right')
@@ -153,10 +157,10 @@ def pantalla_principal():
     frame_cinemas_searchbar.pack(pady=10)
 
     # posters
-    movies_canvas = tk.Canvas(window, bg=bg_color)
-    movies_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    movies_canvas = tk.Canvas(window, bg=bg_color, highlightbackground=bg_color)
+    movies_canvas.pack(side='left', fill=tk.BOTH, expand=True)
     scrollbar = tk.Scrollbar(window, orient="vertical", bg=bg_color, command=movies_canvas.yview)
-    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    scrollbar.pack(side='right', fill='y')
     movies_canvas.configure(yscrollcommand=scrollbar.set)
 
     show_movies(find_movies_by_cinema(cinema_id.get()), movies_canvas)
