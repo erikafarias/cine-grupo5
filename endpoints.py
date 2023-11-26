@@ -44,7 +44,7 @@ def get_cinemas_by_movie_id(id: int) -> list[str]:
         print(f'Ocurrió un error: {err}. Código: {response.status_code}')
     return cinemas
 
-  
+
 def get_cinemas() -> list[dict]:
     
     '''
