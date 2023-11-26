@@ -1,8 +1,8 @@
 import requests
 
-URL:str = 'http://vps-3701198-x.dattaweb.com:4000'
-TOKEN:str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.DGI_v9bwNm_kSrC-CQSb3dBFzxOlrtBDHcEGXvCFqgU'
-AUTH:dict = {'Authorization': f'Bearer {TOKEN}'}
+URL: str = 'http://vps-3701198-x.dattaweb.com:4000'
+TOKEN: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.DGI_v9bwNm_kSrC-CQSb3dBFzxOlrtBDHcEGXvCFqgU'
+AUTH: dict = {'Authorization': f'Bearer {TOKEN}'}
    
 
 def get_movies() -> list[dict]:
@@ -10,9 +10,8 @@ def get_movies() -> list[dict]:
     try:
         endpoint_url: str = f'{URL}/movies'
         response = requests.get(endpoint_url, headers=AUTH)
-        print(response.raise_for_status())
+        response.raise_for_status()
         movies = response.json()
-        print(movies)
     except requests.exceptions.HTTPError as http_err:
         print(f'Ocurrió un error: {http_err}. Código: {response.status_code}')
 
@@ -24,9 +23,8 @@ def get_movie_by_id(id: str) -> dict:
     try:
         endpoint_url: str = f'{URL}/movies/{id}'
         response = requests.get(endpoint_url, headers=AUTH)
-        print(response.raise_for_status())
+        response.raise_for_status()
         movie: dict = response.json()
-        print(movie)
     except requests.exceptions.HTTPError as err:
         print(f'Ocurrió un error: {err}. Código: {response.status_code}')
     return movie
@@ -39,7 +37,6 @@ def get_cinemas_by_movie_id(id: str) -> list[str]:
         response = requests.get(endpoint_url, headers=AUTH)
         response.raise_for_status()
         cinemas = response.json()
-        print(cinemas)
     except requests.exceptions.HTTPError as err:
         print(f'Ocurrió un error: {err}. Código: {response.status_code}')
     return cinemas
@@ -57,7 +54,7 @@ def get_cinemas() -> list[dict]:
         response = requests.get(endpoint, headers = AUTH)
         response.raise_for_status()
         
-        cinemas:list[dict] = response.json()
+        cinemas: list[dict] = response.json()
         return cinemas
     
     except requests.exceptions.HTTPError as err:
