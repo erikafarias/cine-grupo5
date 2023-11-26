@@ -7,3 +7,4 @@ def decodificar_imagen_base64(img: str):
     binario: bytes = b64decode(data)
     imagen: Image = Image.open(BytesIO(binario))
     return imagen
+
