@@ -1,16 +1,14 @@
 import tkinter as tk
 from PIL import ImageTk
 import endpoints
-import utils
+from utils import decodificar_imagen_base64
 
 
 def mostrar_pelicula(pelicula:dict, window:tk, movie_poster:str) -> None:
     
-    canvas = tk.Canvas(window, width = 200, height = 300)
-    canvas.pack(pady=10)
-    
-    poster = ImageTk.PhotoImage(utils.decodificar_imagen_base64(movie_poster))
-    canvas.create_image(20, 20, anchor='nw', image=poster)
+    poster = ImageTk.PhotoImage(decodificar_imagen_base64(movie_poster))
+    poster_label = tk.Label(window, image=poster, bg='black')
+    poster_label.pack(pady = 10)
     
     nombre_pelicula_texto = pelicula['name']
     nombre_pelicula = tk.Label(window, text = nombre_pelicula_texto, font = ('Calibri', 18, "bold"), bg='#2B2A33', fg = '#FFFFFF', anchor='center')
@@ -73,7 +71,7 @@ def pantalla_secundaria(cinema:dict, movie:dict, movie_poster:str) -> None:
     
     # Titulo
     titulo_texto = cinema['location'].upper()
-    titulo = tk.Label(window, text = titulo_texto, font = ("Calibri", 30, "bold", "underline"), bg = '#2B2A33', fg = 'black', anchor='center')
+    titulo = tk.Label(window, text = titulo_texto, font = ("Calibri", 30, "bold", "underline"), bg = '#2B2A33', fg = 'grey', anchor='center')
     titulo.pack(pady = 15)
     
     # Boton pantalla principal
@@ -99,8 +97,8 @@ def pantalla_secundaria(cinema:dict, movie:dict, movie_poster:str) -> None:
     window.mainloop()
 
 
-movie:dict = endpoints.get_movie_by_id('2')
-movie_poster:str = endpoints.get_movie_poster('2')
-cinema:dict = endpoints.get_cinema_info_by_id('2')
+movie:dict = endpoints.get_movie_by_id('3')
+movie_poster:str = endpoints.get_movie_poster('3')
+cinema:dict = endpoints.get_cinema_info_by_id('3')
 
 pantalla_secundaria(cinema, movie, movie_poster)
