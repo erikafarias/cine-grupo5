@@ -19,7 +19,7 @@ def get_movies() -> list[dict]:
     return movies
 
 
-def get_movie_by_id(id: str) -> dict:
+def get_movie_by_id(id: int) -> dict:
     movie: dict = {}
     try:
         endpoint_url: str = f'{URL}/movies/{id}'
@@ -32,18 +32,7 @@ def get_movie_by_id(id: str) -> dict:
     return movie
 
 
-def get_movie_poster(poster_id: str) -> str:
-    
-    try:
-        endpoint_url: str = f'{URL}/posters/{poster_id}'
-        response = requests.get(endpoint_url, headers=AUTH)
-
-        return response.json()['poster_image']
-    except requests.exceptions.HTTPError as err:
-        raise SystemExit('ERROR: ' + str(err))
-
-
-def get_cinemas_by_movie_id(id: str) -> list[str]:
+def get_cinemas_by_movie_id(id: int) -> list[str]:
     cinemas: list[str] = []
     try:
         endpoint_url: str = f'{URL}/movies/{id}/cinemas'
@@ -75,7 +64,7 @@ def get_cinemas() -> list[dict]:
         raise SystemExit('ERROR: ' + str(err))
 
 
-def get_movies_by_cinema(cinema_id: str) -> list[dict]:
+def get_movies_by_cinema(cinema_id:int) -> list[dict]:
     
     '''
     Obtener películas proyectadas en un determinado cine.
@@ -94,38 +83,24 @@ def get_movies_by_cinema(cinema_id: str) -> list[dict]:
         raise SystemExit('ERROR: ' + str(err))
 
 
-def get_cinema_info_by_id(cinema_id: str) -> dict:
-    
-    '''
-    Obtengo la informacion del cine.
-    '''
-    
-    cinemas:list[dict] = get_cinemas()
-       
-    for cinema in cinemas:
-        
-        if cinema["cinema_id"] == str(cinema_id):
-            return cinema
-
-
 def stock_snacks() -> tuple[list, list]:
 
-   '''
-   Los nombres y los precios por separado
-   '''
+        '''
+        Los nombres y los precios por separado
+        '''
 
-   endpoint: str = f'{URL}/snacks'
-   response = requests.get(endpoint, headers=AUTH)
-   response.raise_for_status()
+        endpoint: str = f'{URL}/snacks'
+        response = requests.get(endpoint, headers=AUTH)
+        response.raise_for_status()
 
-   stock_of_snacks: [dict] = response.json()
-   list_names_snacks: list = []
-   for elemento in stock_of_snacks:
-      list_names_snacks.append(elemento)
+        stock_of_snacks: [dict] = response.json()
+        list_names_snacks: list = []
+        for elemento in stock_of_snacks:
+            list_names_snacks.append(elemento)
 
-      list_prices_snacks: list = []
-      for elemento in list_names_snacks:
-         list_prices_snacks.append(stock_of_snacks[elemento])
+        list_prices_snacks: list = []
+        for elemento in list_names_snacks:
+            list_prices_snacks.append(stock_of_snacks[elemento])
 
-   return list_names_snacks, list_prices_snacks
+        return list_names_snacks, list_prices_snacks
         
