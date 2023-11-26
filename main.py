@@ -43,7 +43,7 @@ def mostrar_sala(cinema:dict, window:tk) -> None:
     
     if cinema['available_seats'] > 0:
 
-        boton_reserva = tk.Button(window, text="RESERVAR", command='Aca iria la funcion de pantalla de reserva')
+        boton_reserva = tk.Button(window, text="RESERVAR", command='pantalla_reserva()')
         boton_reserva.configure(
             relief=tk.RAISED,
             bd=3,
@@ -62,7 +62,9 @@ def mostrar_sala(cinema:dict, window:tk) -> None:
         label.pack(pady = 10)
 
 
-def pantalla_secundaria(ID_cinema:str, ID_pelicula:str) -> None:
+def pantalla_secundaria(window_principal:tk, ID_cinema:str, ID_pelicula:str) -> None:
+    
+    window_principal.withdraw() # Cierra la ventana anterior
     
     cinema:dict = endpoints.get_cinema_info_by_id(ID_cinema)
     movie:dict = endpoints.get_movie_by_id(ID_pelicula)
@@ -79,7 +81,7 @@ def pantalla_secundaria(ID_cinema:str, ID_pelicula:str) -> None:
     titulo.pack(pady = 15)
     
     # Boton pantalla principal
-    boton_pantalla_principal = tk.Button(window, text=">> Volver a pantalla principal", command='Aca iria la funcion de pantalla principal')
+    boton_pantalla_principal = tk.Button(window, text=">> Volver a pantalla principal", command='pantalla_principal()')
     boton_pantalla_principal.configure(
         relief=tk.RAISED,
         bd=3,
@@ -115,8 +117,6 @@ def main() -> None:
         'timestamp_compra'  : '' # Hora de la compra -> Cuando el usuario selecciona "comprar" en la pantalla checkout
     }
 
-    pantalla_secundaria(compra['ID_cinema'], compra['ID_pelicula'])
+    pantalla_secundaria(window_principal, compra['ID_cinema'], compra['ID_pelicula'])
 
 main()
-
-
