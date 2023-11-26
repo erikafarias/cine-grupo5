@@ -1,8 +1,12 @@
 import tkinter as tk
+from PIL import ImageTk
 import endpoints
+from utils import decodificar_imagen_base64
 
 
-def pantalla_checkout(venta:dict) -> None:
+def pantalla_checkout(window_reserva:tk, compra:dict) -> None:
+    
+    window_reserva.withdraw() # Cierra la ventana anterior
     
     total:float = 0.0
     total_entradas:float = 0.0
@@ -31,17 +35,17 @@ def pantalla_checkout(venta:dict) -> None:
     titulo_entradas_texto = ' ENTRADAS '
     titulo_entradas = tk.Label(entradas_canvas, text = titulo_entradas_texto, font = ("Calibri", 20, "bold"), bg = 'white', fg = 'black', anchor='center')
     titulo_entradas.pack(pady = 20)   
-    titulo_pelicula_texto = venta['entradas'][0]
+    titulo_pelicula_texto = compra['nombre_pelicula']
     titulo_pelicula = tk.Label(entradas_canvas, text = titulo_pelicula_texto, font = ("Calibri", 15, "bold"), bg= '#2B2A33', fg = 'white', anchor='center')
     titulo_pelicula.pack(pady = 5)
-    titulo_cantidad_entradas_texto = "- Entradas: " + str(venta['entradas'][2])
+    titulo_cantidad_entradas_texto = "- Entradas: " + str(compra['cantidad_entradas'])
     titulo_cantidad_entradas = tk.Label(entradas_canvas, text = titulo_cantidad_entradas_texto, font = ("Calibri", 10), bg= '#2B2A33', fg = 'white', anchor='center')
     titulo_cantidad_entradas.pack(pady = 5)   
-    titulo_entradas_precio_texto = "- Precio Unitario: $" + str(venta['entradas'][1])
+    titulo_entradas_precio_texto = "- Precio Unitario: $" + str(compra['precio_entrada'])
     titulo_entradas_precio = tk.Label(entradas_canvas, text = titulo_entradas_precio_texto, font = ("Calibri", 10), bg= '#2B2A33', fg = 'white', anchor='center')
     titulo_entradas_precio.pack(pady = 5)   
     
-    total_entradas = venta['entradas'][1]*venta['entradas'][2]
+    total_entradas = compra['cantidad_entradas']*compra['precio_entrada']
     
     titulo_entradas_total_texto = "TOTAL ENTRADAS: $" + str(total_entradas)
     titulo_entradas_total = tk.Label(entradas_canvas, text = titulo_entradas_total_texto, font = ("Calibri", 12, "bold"), bg = 'black', fg = 'white', anchor='center')
@@ -55,11 +59,11 @@ def pantalla_checkout(venta:dict) -> None:
     titulo_snacks = tk.Label(snacks_canvas, text = titulo_snacks_texto, font = ("Calibri", 20, "bold"), bg = 'white', fg = 'black', anchor='center')
     titulo_snacks.pack(pady = 20)
     
-    for snack in venta['snack']:
+    for snack in compra['snacks']:
         titulo_snack_nombre_texto = "+ " + snack[0]
         titulo_snack_nombre = tk.Label(snacks_canvas, text = titulo_snack_nombre_texto, font = ("Calibri", 15, "bold"), bg= '#2B2A33', fg = 'white', anchor='center')
         titulo_snack_nombre.pack(pady = 10)
-        titulo_cantidad_snack_texto = "Cantidad: " + str(snack[2])
+        titulo_cantidad_snack_texto = "Cantidad: " + str(snack[1])
         titulo_cantidad_snack = tk.Label(snacks_canvas, text = titulo_cantidad_snack_texto, font = ("Calibri", 10), bg= '#2B2A33', fg = 'white', anchor='center')
         titulo_cantidad_snack.pack(pady = 5)   
         titulo_snack_precio_texto = "Precio: $" + str(snack[1]*snack[2])
@@ -95,9 +99,21 @@ def pantalla_checkout(venta:dict) -> None:
     window.mainloop()
 
 
-venta:dict = {
-    'entradas' : [ 'Mago de Oz', 1000, 2],
-    'snack' : [ [ 'papitas', 500, 1], [ 'coca', 1500, 2], [ 'pochoclos', 500, 2] ]
-}
+def main() -> None:
+    
+    # Diccionario que guarda toda la info correspondiente a la compra ha realizar. Se utiliza en todas las ventanas.
+    compra: dict = {
+        'ID_QR'             : '', # Este arrancatia vacio y se llena una vez realizada la compra y generado el QR
+        'ID_pelicula'       : '2', # Pelicula elegida por el usuario en la pantalla principal
+        'nombre_pelicula'   : '',
+        'ID_cinema'         : '2', # Cine elegido por el usuario en la pantalla principal
+        'cantidad_entradas' : 0,
+        'precio_entrada'    : 0, # Este ya lo definimos aca hardcodeado
+        'snacks'            : [ ['nombre snack', 'cantidad', 'precio unitario'] , ["nombre snack", 'cantidad', 'precio unitario'] ],
+        'timestamp_compra'  : '' # Hora de la compra -> Cuando el usuario selecciona "comprar" en la pantalla checkout
+    }
 
-pantalla_checkout(venta)
+    pantalla_secundaria(window_principal, compra['ID_cinema'], compra['ID_pelicula'])
+    pantalla_checkout(window_reserva, compra)
+
+main()
