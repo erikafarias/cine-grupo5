@@ -61,6 +61,20 @@ def get_cinemas() -> list[dict]:
         raise SystemExit('ERROR: ' + str(err))
 
 
+def get_cinema_info_by_id(cinema_id:int) -> dict:
+    
+    '''
+    Obtengo la informacion del cine.
+    '''
+    
+    cinemas:list[dict] = get_cinemas()
+       
+    for cinema in cinemas:
+        
+        if cinema["cinema_id"] == str(cinema_id):
+            return cinema
+
+
 def get_movies_by_cinema(cinema_id: str) -> list[dict]:
     
     '''

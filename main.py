@@ -3,12 +3,189 @@ from PIL import ImageTk
 import endpoints
 from utils import decodificar_imagen_base64
 
+WINDOW = tk.Tk()
 
-def mostrar_pelicula(movie:dict, window:tk, movie_poster:str) -> None:
+
+def find_all_movies():
+    movies: list[dict] = endpoints.get_movies()
+    return movies
+
+
+def find_movies_by_cinema(cinema_id: str) -> list[dict]:
+    movies_by_cinema: list[dict] = endpoints.get_movies_by_cinema(cinema_id)
+    all_movies: list[dict] = find_all_movies()
+    movies: list[dict] = []
+    for movie in all_movies:
+        if movie['movie_id'] in movies_by_cinema[0]['has_movies']:
+            movies.append(movie)
+
+    return movies
+
+
+def find_poster(poster_id: str) -> str:
+    poster: dict = endpoints.get_poster_by_id(poster_id)
+    return poster['poster_image']
+
+
+def find_cinemas() -> list[dict]:
+    cinemas: list[dict] = endpoints.get_cinemas()
+    return cinemas
+
+
+def list_cinemas_names(cinemas: list[dict]) -> list[str]:
+    cinemas_names: list[str] = []
+    for cinema in cinemas:
+        cinemas_names.append(cinema['location'])
+
+    return cinemas_names
+
+
+def change_cinema(cinema_id: str, movies_container: tk.Canvas, window:tk, compra:dict):
+    movies: list[dict] = find_movies_by_cinema(cinema_id)
+    show_movies(movies, movies_container, window, compra)
     
-    poster = ImageTk.PhotoImage(decodificar_imagen_base64(movie_poster))
-    poster_label = tk.Label(window, image=poster, bg='black')
-    poster_label.pack(pady = 10)
+    compra['ID_cinema'] = cinema_id
+
+
+def find_cinema_id_by_name(cinemas: list[dict], cinema_name: str):
+    for c in cinemas:
+        if cinema_name == c['location']:
+            return c['cinema_id']
+
+
+def update_cinema_id(cinema_name: str, cinema_id: tk.StringVar, cinemas_list):
+    cinema_id.set(find_cinema_id_by_name(cinemas_list, cinema_name))
+
+
+def find_movie_by_name(movie_name: str, cinema_id: str, movies_canvas: tk.Canvas, entry: tk.Entry, window:tk, compra:dict):
+    movies: list[dict] = find_movies_by_cinema(cinema_id)
+    movies_found: list[dict] = []
+
+    for movie in movies:
+        if movie_name.upper() in movie['name'].upper():
+            print(movie)
+            movies_found.append(movie)
+
+    if len(movies_found) == 0:
+        movies_canvas.delete('all')
+        label_no_disponibles = tk.Label(movies_canvas, text=f'No hay películas disponibles que coincidan con su '
+                                                            f'búsqueda: {movie_name}', font='Calibri 18 bold',
+                                        bg='#2B2A33', fg='#FFFFFF')
+        label_no_disponibles.pack(fill='both', pady='10', padx='10', expand=True)
+    else:
+        show_movies(movies_found, movies_canvas, window, compra)
+
+    entry.delete(0, tk.END)
+
+    return movies_found
+
+
+def show_movies(movies: list[dict], movies_canvas: tk.Canvas, window:tk, compra:dict):
+    number_of_movies: int = len(movies)
+    NUMBER_OF_COLUMNS: int = 4
+    number_of_rows: int = round(number_of_movies / NUMBER_OF_COLUMNS) + 1
+
+    movies_canvas.delete('all')
+
+    movies_frame = tk.Frame(movies_canvas, bg='#2B2A33', highlightbackground='#2B2A33')
+    movies_frame.pack(fill='both')
+    movies_canvas.create_window((0, 0), window=movies_frame, anchor='nw')
+
+    m: int = 0
+
+    for r in range(number_of_rows):
+        for c in range(NUMBER_OF_COLUMNS):
+            if m < number_of_movies:
+                
+                frame_movie = tk.Frame(movies_frame, bg='#2B2A33')
+                frame_movie.grid(row=r, column=c, padx=10, pady=10)
+                poster_base64_movie = find_poster(movies[m]['poster_id'])
+                poster_movie = ImageTk.PhotoImage(decodificar_imagen_base64(poster_base64_movie))
+                
+                button = tk.Button(frame_movie, image=poster_movie, bg='#2B2A33', command = lambda ID_movie = movies[m]['movie_id'] : pantalla_secundaria(window, compra, ID_movie))
+                button.image = poster_movie  # to prevent garbage collection
+                button.grid(row=0, column=0)
+                
+                label_movie = tk.Label(frame_movie, text=movies[m]['name'], font='Calibri 14', bg='#2B2A33',
+                                       fg='#FFFFFF')
+                label_movie.grid(row=1, column=0)
+
+                m += 1
+
+    movies_frame.update_idletasks()
+    movies_canvas.update_idletasks()
+    movies_canvas.config(scrollregion=movies_canvas.bbox('all'))
+
+
+def pantalla_principal(compra:dict) -> None:
+    bg_color = '#2B2A33'
+    fg_color = '#FFFFFF'
+
+    window = tk.Toplevel()
+    window.title('Menu')
+    window.geometry('1280x720')
+    window.configure(bg='#2B2A33')
+
+    # title
+    title_label = tk.Label(master=window, text='Cartelera', font='Calibri 24 bold', bg=bg_color, fg=fg_color)
+    title_label.pack()
+
+    frame_cinemas_searchbar = tk.Frame(window, bg=bg_color)
+    # select cinemas
+    frame_option_menu = tk.Frame(frame_cinemas_searchbar, bg=bg_color)
+    cinemas_list: list[dict] = find_cinemas()
+    cinemas_names: list[str] = list_cinemas_names(cinemas_list)
+    selected_cinema = tk.StringVar()
+    cinema_id = tk.StringVar()
+    selected_cinema.set(cinemas_names[0])
+    cinema_id.set(find_cinema_id_by_name(cinemas_list, selected_cinema.get()))
+    selected_cinema.trace_add('write', lambda *args: update_cinema_id(selected_cinema.get(), cinema_id, cinemas_list))
+    select_cinema = tk.OptionMenu(frame_option_menu, selected_cinema, *cinemas_names,
+                                  command=lambda event: change_cinema(cinema_id.get(), movies_canvas, window, compra))
+    select_cinema.config(font='Calibri 16 bold', bg=bg_color, fg=fg_color, width='50', highlightbackground=bg_color)
+    select_cinema['menu'].config(font='Calibri 16', bg='#302F39', fg=fg_color)
+    select_cinema.pack()
+    frame_option_menu.pack(side='left')
+
+    # search bar
+    input_frame = tk.Frame(master=frame_cinemas_searchbar, bg=bg_color, highlightbackground=bg_color)
+    movie_name = tk.StringVar()
+    input_entry = tk.Entry(master=input_frame, textvariable=movie_name, font='Calibri 14', bg=bg_color, fg=fg_color)
+    button = tk.Button(master=input_frame, text='Buscar',
+                       command=lambda: find_movie_by_name(movie_name.get(), cinema_id.get(), movies_canvas,
+                                                          input_entry, window, compra))
+    button.configure(font='Calibri 14 bold', bg=bg_color, fg=fg_color, pady=0, highlightbackground=bg_color)
+    input_entry.pack(side='left', padx='10')
+    button.pack(side='right')
+    input_frame.pack(side='right')
+
+    frame_cinemas_searchbar.pack(pady=10)
+    
+    # Guardo en el diccionario el cine elegido
+    compra['ID_cinema'] = cinema_id.get()
+
+    # posters
+    movies_canvas = tk.Canvas(window, bg=bg_color, highlightbackground=bg_color)
+    movies_canvas.pack(side='left', fill=tk.BOTH, expand=True)
+    scrollbar = tk.Scrollbar(window, orient="vertical", bg=bg_color, command=movies_canvas.yview)
+    scrollbar.pack(side='right', fill='y')
+    movies_canvas.configure(yscrollcommand=scrollbar.set)
+
+    show_movies(find_movies_by_cinema(cinema_id.get()), movies_canvas, window, compra)
+
+    window.mainloop()
+
+
+def mostrar_pelicula(movie:dict, window:tk) -> None:
+    
+    frame_movie = tk.Frame(window, bg='#2B2A33')
+    frame_movie.pack(pady = 10)
+    poster_base64_movie = find_poster(movie['poster_id'])
+    poster = ImageTk.PhotoImage(decodificar_imagen_base64(poster_base64_movie))
+    
+    button_movie = tk.Button(frame_movie, image=poster, bg='#2B2A33', state='disabled')
+    button_movie.image = poster  # to prevent garbage collection
+    button_movie.pack()
     
     nombre_pelicula_texto = movie['name']
     nombre_pelicula = tk.Label(window, text = nombre_pelicula_texto, font = ('Calibri', 18, "bold"), bg='#2B2A33', fg = '#FFFFFF', anchor='center')
@@ -62,15 +239,16 @@ def mostrar_sala(cinema:dict, window:tk) -> None:
         label.pack(pady = 10)
 
 
-def pantalla_secundaria(window_principal:tk, ID_cinema:str, ID_pelicula:str) -> None:
+def pantalla_secundaria(window_principal:tk, compra:dict, ID_movie:str) -> None:
+        
+    compra['ID_pelicula'] = ID_movie # Guardo el ID de la pelicula en el diccionario que viene del boton seleccionado
     
     window_principal.withdraw() # Cierra la ventana anterior
     
-    cinema:dict = endpoints.get_cinema_info_by_id(ID_cinema)
-    movie:dict = endpoints.get_movie_by_id(ID_pelicula)
-    movie_poster:str = endpoints.get_poster_by_id(movie['poster_id'])['poster_image']
+    cinema:dict = endpoints.get_cinema_info_by_id(compra['ID_cinema'])
+    movie:dict = endpoints.get_movie_by_id(compra['ID_pelicula'])
     
-    window = tk.Tk(screenName='Pantalla Secundaria')
+    window = tk.Toplevel()
     window.geometry("1280x720")
     window.configure(bg='#2B2A33')
     window.title('PANTALLA SECUNDARIA')
@@ -81,7 +259,7 @@ def pantalla_secundaria(window_principal:tk, ID_cinema:str, ID_pelicula:str) -> 
     titulo.pack(pady = 15)
     
     # Boton pantalla principal
-    boton_pantalla_principal = tk.Button(window, text=">> Volver a pantalla principal", command='pantalla_principal()')
+    boton_pantalla_principal = tk.Button(window, text=">> Volver a pantalla principal", command= lambda : [window.withdraw(), pantalla_principal(compra)])
     boton_pantalla_principal.configure(
         relief=tk.RAISED,
         bd=3,
@@ -95,7 +273,7 @@ def pantalla_secundaria(window_principal:tk, ID_cinema:str, ID_pelicula:str) -> 
     boton_pantalla_principal.pack(pady = 10)
     
     # Muestro la pelicula elegida
-    mostrar_pelicula(movie, window, movie_poster)
+    mostrar_pelicula(movie, window)
     
     # Muestro sala con boton de reserva
     mostrar_sala(cinema, window)
@@ -201,17 +379,19 @@ def main() -> None:
     # Diccionario que guarda toda la info correspondiente a la compra ha realizar. Se utiliza en todas las ventanas.
     compra: dict = {
         'ID_QR'             : '', # Este arrancatia vacio y se llena una vez realizada la compra y generado el QR
-        'ID_pelicula'       : '2', # Pelicula elegida por el usuario en la pantalla principal
-        'nombre_pelicula'   : '',
-        'ID_cinema'         : '2', # Cine elegido por el usuario en la pantalla principal
+        'ID_pelicula'       : '', # Pelicula elegida por el usuario en la pantalla principal
+        'ID_cinema'         : '', # Cine elegido por el usuario en la pantalla principal
         'cantidad_entradas' : 0,
         'precio_entrada'    : 0, # Este ya lo definimos aca hardcodeado
-        'snacks'            : [ ['nombre snack', 'cantidad', 'precio unitario'] , ["nombre snack", 'cantidad', 'precio unitario'] ],
+        'snacks'            : [ [] ],
         'timestamp_compra'  : '' # Hora de la compra -> Cuando el usuario selecciona "comprar" en la pantalla checkout
     }
+    
+    WINDOW.withdraw()
 
-    pantalla_secundaria(window_principal, compra['ID_cinema'], compra['ID_pelicula'])
-    pantalla_checkout(window_reserva, compra)
+    pantalla_principal(compra)
+    # pantalla_checkout(window_reserva, compra)
 
+    WINDOW.mainloop()
 
 main()
