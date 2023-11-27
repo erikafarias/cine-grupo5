@@ -94,7 +94,7 @@ def get_movies_by_cinema(cinema_id: str) -> list[dict]:
         raise SystemExit('ERROR: ' + str(err))
 
 
-def stock_snacks() -> tuple[list, list]:
+def stock_snacks() -> tuple[list, list, list, dict]:
 
         '''
         Los nombres y los precios por separado
@@ -113,8 +113,16 @@ def stock_snacks() -> tuple[list, list]:
         for elemento in list_names_snacks:
             list_prices_snacks.append(stock_of_snacks[elemento])
 
-        return list_names_snacks, list_prices_snacks
+        list_ult:list = []
+        n:int = 0
 
+        for element in list_names_snacks:
+            text: str = f"{element} >> ${list_prices_snacks[n]}"
+            n+=1
+            list_ult.append(text)
+
+        return list_names_snacks, list_prices_snacks, list_ult, stock_of_snacks
+        
 def get_poster_by_id(id: str) -> dict:
     try:
         endpoint: str = f'{URL}/posters/{id}'
