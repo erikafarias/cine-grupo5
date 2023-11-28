@@ -3,45 +3,27 @@ from PIL import ImageTk
 import endpoints
 from utils import decodificar_imagen_base64
 
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from endpoints import *
 import datetime
 import locale
 import random, string
-import qrcode
-from tkinter import messagebox
+import qrcode # pip install qrcode
 import json
-
-
 
 
 WINDOW = tk.Tk()
 
 
-def find_all_movies():
-    movies: list[dict] = endpoints.get_movies()
-    return movies
-
-
 def find_movies_by_cinema(cinema_id: str) -> list[dict]:
     movies_by_cinema: list[dict] = endpoints.get_movies_by_cinema(cinema_id)
-    all_movies: list[dict] = find_all_movies()
+    all_movies: list[dict] = endpoints.get_movies()
     movies: list[dict] = []
     for movie in all_movies:
         if movie['movie_id'] in movies_by_cinema[0]['has_movies']:
             movies.append(movie)
 
     return movies
-
-
-def find_poster(poster_id: str) -> str:
-    poster: dict = endpoints.get_poster_by_id(poster_id)
-    return poster['poster_image']
-
-
-def find_cinemas() -> list[dict]:
-    cinemas: list[dict] = endpoints.get_cinemas()
-    return cinemas
 
 
 def list_cinemas_names(cinemas: list[dict]) -> list[str]:
@@ -52,24 +34,24 @@ def list_cinemas_names(cinemas: list[dict]) -> list[str]:
     return cinemas_names
 
 
-def change_cinema(cinema_id: str, movies_container: tk.Canvas, window:tk, compra:dict):
+def change_cinema(cinema_id: str, movies_container: tk.Canvas, window: tk, sale: dict) -> None:
     movies: list[dict] = find_movies_by_cinema(cinema_id)
-    show_movies(movies, movies_container, window, compra)
+    show_movies(movies, movies_container, window, sale)
     
-    compra['ID_cinema'] = cinema_id
+    sale['ID_cinema'] = cinema_id
 
 
-def find_cinema_id_by_name(cinemas: list[dict], cinema_name: str):
+def find_cinema_id_by_name(cinemas: list[dict], cinema_name: str) -> str:
     for c in cinemas:
         if cinema_name == c['location']:
             return c['cinema_id']
 
 
-def update_cinema_id(cinema_name: str, cinema_id: tk.StringVar, cinemas_list):
+def update_cinema_id(cinema_name: str, cinema_id: tk.StringVar, cinemas_list: list) -> None:
     cinema_id.set(find_cinema_id_by_name(cinemas_list, cinema_name))
 
 
-def find_movie_by_name(movie_name: str, cinema_id: str, movies_canvas: tk.Canvas, entry: tk.Entry, window:tk, compra:dict):
+def find_movie_by_name(movie_name: str, cinema_id: str, movies_canvas: tk.Canvas, entry: tk.Entry, window:tk, sale: dict) -> list[dict]:
     movies: list[dict] = find_movies_by_cinema(cinema_id)
     movies_found: list[dict] = []
 
@@ -85,14 +67,14 @@ def find_movie_by_name(movie_name: str, cinema_id: str, movies_canvas: tk.Canvas
                                         bg='#2B2A33', fg='#FFFFFF')
         label_no_disponibles.pack(fill='both', pady='10', padx='10', expand=True)
     else:
-        show_movies(movies_found, movies_canvas, window, compra)
+        show_movies(movies_found, movies_canvas, window, sale)
 
     entry.delete(0, tk.END)
 
     return movies_found
 
 
-def show_movies(movies: list[dict], movies_canvas: tk.Canvas, window:tk, compra:dict):
+def show_movies(movies: list[dict], movies_canvas: tk.Canvas, window: tk, sale: dict) -> None:
     number_of_movies: int = len(movies)
     NUMBER_OF_COLUMNS: int = 4
     number_of_rows: int = round(number_of_movies / NUMBER_OF_COLUMNS) + 1
@@ -111,10 +93,10 @@ def show_movies(movies: list[dict], movies_canvas: tk.Canvas, window:tk, compra:
                 
                 frame_movie = tk.Frame(movies_frame, bg='#2B2A33')
                 frame_movie.grid(row=r, column=c, padx=10, pady=10)
-                poster_base64_movie = find_poster(movies[m]['poster_id'])
+                poster_base64_movie = endpoints.get_poster_by_id(movies[m]['poster_id'])
                 poster_movie = ImageTk.PhotoImage(decodificar_imagen_base64(poster_base64_movie))
                 
-                button = tk.Button(frame_movie, image=poster_movie, bg='#2B2A33', command = lambda ID_movie = movies[m]['movie_id'] : pantalla_secundaria(window, compra, ID_movie))
+                button = tk.Button(frame_movie, image=poster_movie, bg='#2B2A33', command = lambda ID_movie = movies[m]['movie_id'] : secondary_window(window, sale, ID_movie))
                 button.image = poster_movie  # to prevent garbage collection
                 button.grid(row=0, column=0)
                 
@@ -129,7 +111,7 @@ def show_movies(movies: list[dict], movies_canvas: tk.Canvas, window:tk, compra:
     movies_canvas.config(scrollregion=movies_canvas.bbox('all'))
 
 
-def pantalla_principal(compra:dict) -> None:
+def principal_window(sale: dict) -> None:
     bg_color = '#2B2A33'
     fg_color = '#FFFFFF'
 
@@ -145,7 +127,7 @@ def pantalla_principal(compra:dict) -> None:
     frame_cinemas_searchbar = tk.Frame(window, bg=bg_color)
     # select cinemas
     frame_option_menu = tk.Frame(frame_cinemas_searchbar, bg=bg_color)
-    cinemas_list: list[dict] = find_cinemas()
+    cinemas_list: list[dict] = endpoints.get_cinemas()
     cinemas_names: list[str] = list_cinemas_names(cinemas_list)
     selected_cinema = tk.StringVar()
     cinema_id = tk.StringVar()
@@ -153,7 +135,7 @@ def pantalla_principal(compra:dict) -> None:
     cinema_id.set(find_cinema_id_by_name(cinemas_list, selected_cinema.get()))
     selected_cinema.trace_add('write', lambda *args: update_cinema_id(selected_cinema.get(), cinema_id, cinemas_list))
     select_cinema = tk.OptionMenu(frame_option_menu, selected_cinema, *cinemas_names,
-                                  command=lambda event: change_cinema(cinema_id.get(), movies_canvas, window, compra))
+                                  command=lambda event: change_cinema(cinema_id.get(), movies_canvas, window, sale))
     select_cinema.config(font='Calibri 16 bold', bg=bg_color, fg=fg_color, width='50', highlightbackground=bg_color)
     select_cinema['menu'].config(font='Calibri 16', bg='#302F39', fg=fg_color)
     select_cinema.pack()
@@ -165,7 +147,7 @@ def pantalla_principal(compra:dict) -> None:
     input_entry = tk.Entry(master=input_frame, textvariable=movie_name, font='Calibri 14', bg=bg_color, fg=fg_color)
     button = tk.Button(master=input_frame, text='Buscar',
                        command=lambda: find_movie_by_name(movie_name.get(), cinema_id.get(), movies_canvas,
-                                                          input_entry, window, compra))
+                                                          input_entry, window, sale))
     button.configure(font='Calibri 14 bold', bg=bg_color, fg=fg_color, pady=0, highlightbackground=bg_color)
     input_entry.pack(side='left', padx='10')
     button.pack(side='right')
@@ -174,7 +156,7 @@ def pantalla_principal(compra:dict) -> None:
     frame_cinemas_searchbar.pack(pady=10)
     
     # Guardo en el diccionario el cine elegido
-    compra['ID_cinema'] = cinema_id.get()
+    sale['ID_cinema'] = cinema_id.get()
 
     # posters
     movies_canvas = tk.Canvas(window, bg=bg_color, highlightbackground=bg_color)
@@ -183,19 +165,19 @@ def pantalla_principal(compra:dict) -> None:
     scrollbar.pack(side='right', fill='y')
     movies_canvas.configure(yscrollcommand=scrollbar.set)
 
-    show_movies(find_movies_by_cinema(cinema_id.get()), movies_canvas, window, compra)
+    show_movies(find_movies_by_cinema(cinema_id.get()), movies_canvas, window, sale)
 
     window.mainloop()
 
 
-def mostrar_pelicula(movie:dict, window:tk) -> None:
+def show_movie_info(movie: dict, window: tk) -> None:
     
     frame_movie = tk.Frame(window, bg='#2B2A33')
     frame_movie.pack(pady = 10)
-    poster_base64_movie = find_poster(movie['poster_id'])
+    poster_base64_movie = endpoints.get_poster_by_id(movie['poster_id'])
     poster = ImageTk.PhotoImage(decodificar_imagen_base64(poster_base64_movie))
     
-    button_movie = tk.Button(frame_movie, image=poster, bg='#2B2A33', state='disabled')
+    button_movie = tk.Button(frame_movie, image=poster, bg='#2B2A33')
     button_movie.image = poster  # to prevent garbage collection
     button_movie.pack()
     
@@ -224,7 +206,7 @@ def mostrar_pelicula(movie:dict, window:tk) -> None:
     rating.pack(pady = 5)
 
 
-def mostrar_sala(cinema:dict, window:tk, compra) -> None:
+def show_room_with_seats(cinema: dict, window: tk, sale: dict) -> None:
       
     asientos_texto = "Asientos disponibles:    " + str(cinema['available_seats'])
     asientos = tk.Label(window, text = asientos_texto, font = ('Calibri', 10, 'italic'), bg='#2B2A33', fg = '#FFFFFF', highlightthickness=1, padx=10)
@@ -232,7 +214,7 @@ def mostrar_sala(cinema:dict, window:tk, compra) -> None:
     
     if cinema['available_seats'] > 0:
 
-        boton_reserva = tk.Button(window, text="RESERVAR", command= lambda:pantalla_reserva(compra,window))
+        boton_reserva = tk.Button(window, text="RESERVAR", command= lambda:reservation_window(sale,window))
         boton_reserva.configure(
             relief=tk.RAISED,
             bd=3,
@@ -251,8 +233,49 @@ def mostrar_sala(cinema:dict, window:tk, compra) -> None:
         label.pack(pady = 10)
 
 
+def secondary_window(window_principal: tk, sale: dict, ID_movie: str) -> None:
+        
+    sale['ID_pelicula'] = ID_movie # Guardo el ID de la pelicula en el diccionario que viene del boton seleccionado
+    
+    window_principal.withdraw() # Cierra la ventana anterior
+    
+    cinema:dict = endpoints.get_cinema_info_by_id(sale['ID_cinema'])
+    movie:dict = endpoints.get_movie_by_id(sale['ID_pelicula'])
+    
+    window = tk.Toplevel()
+    window.geometry("1280x720")
+    window.configure(bg='#2B2A33')
+    window.title('PANTALLA SECUNDARIA')
+    
+    # Titulo
+    titulo_texto = cinema['location'].upper()
+    titulo = tk.Label(window, text = titulo_texto, font = ("Calibri", 30, "bold", "underline"), bg = '#2B2A33', fg = 'grey', anchor='center')
+    titulo.pack(pady = 15)
+    
+    # Boton pantalla principal
+    boton_principal_window = tk.Button(window, text=">> Volver a pantalla principal", command= lambda : [window.withdraw(), principal_window(sale)])
+    boton_principal_window.configure(
+        relief=tk.RAISED,
+        bd=3,
+        font=('Calibri', 8, 'bold'),
+        foreground='#FFFFFF',
+        background='black',
+        padx=10,
+        pady=5,
+        anchor='center'
+    )
+    boton_principal_window.pack(pady = 10)
+    
+    # Muestro la pelicula elegida
+    show_movie_info(movie, window)
+    
+    # Muestro sala con boton de reserva
+    show_room_with_seats(cinema, window, sale)
 
-def price_per_ticket(number_box, price, final_price_ticket, text_value=None):
+    window.mainloop()
+
+
+def price_per_ticket(number_box, price, final_price_ticket, text_value=None) -> None:
     number = int(number_box.get())
 
     if number == 1:
@@ -265,8 +288,7 @@ def price_per_ticket(number_box, price, final_price_ticket, text_value=None):
     text_value['text'] = f"${final_price_ticket}"
 
 
-
-def add_to_cart(number_snack,snacks_box,dict_cart,text_value_2,stock_of_snacks,price,number_box,final) -> None:
+def add_to_cart(number_snack, snacks_box, dict_cart, text_value_2, stock_of_snacks, price, number_box, final) -> None:
     
     number_snacks = int(number_snack.get() )
     snack = str(snacks_box.get())
@@ -291,17 +313,16 @@ def add_to_cart(number_snack,snacks_box,dict_cart,text_value_2,stock_of_snacks,p
     text_value_2['text'] = f"{dict_cart} : ${final_price}"
 
 
-def ticket_confirm(dict_cart,number_box,price,final_price_ticket):
+def ticket_confirm(dict_cart, number_box, price, final_price_ticket) -> None:
 
     number_tickets =  number_box.get()
     number_tickets = int(number_tickets)
 
     final_price_ticket = (number_tickets * price)
     dict_cart['Asientos'] = (number_tickets,final_price_ticket)
-    #print(final_price_ticket)
 
 
-def pantalla_reserva(compra, window) -> None:
+def reservation_window(sale: dict, window: tk) -> None:
     window.withdraw()
 
     window1 = tk.Tk()
@@ -312,8 +333,8 @@ def pantalla_reserva(compra, window) -> None:
     font_type = 'Calibri'
 
 
-    price = float(compra['precio_entrada'])
-    list_names_snacks, list_prices_snacks, list_ult, stock_of_snacks = stock_snacks()
+    price = float(sale['precio_entrada'])
+    list_names_snacks, list_prices_snacks, list_ult, stock_of_snacks = endpoints.get_stock_snacks()
     final = []
     dict_cart: dict = {}
     final_price_ticket: int = 0
@@ -473,64 +494,22 @@ def pantalla_reserva(compra, window) -> None:
         window1,
         font=(font_type, 18),
         text= "Checkout/Pagar",
-        command= lambda:pantalla_checkout(window1,compra,dict_cart,list_names_snacks)
+        command= lambda:checkout_window(window1,sale,dict_cart,list_names_snacks)
         )
     final_button.place(x=550, y=600)
 
     window1.mainloop()
 
 
-def pantalla_secundaria(window_principal:tk, compra:dict, ID_movie:str) -> None:
-        
-    compra['ID_pelicula'] = ID_movie # Guardo el ID de la pelicula en el diccionario que viene del boton seleccionado
-    
-    window_principal.withdraw() # Cierra la ventana anterior
-    
-    cinema:dict = endpoints.get_cinema_info_by_id(compra['ID_cinema'])
-    movie:dict = endpoints.get_movie_by_id(compra['ID_pelicula'])
-    
-    window = tk.Toplevel()
-    window.geometry("1280x720")
-    window.configure(bg='#2B2A33')
-    window.title('PANTALLA SECUNDARIA')
-    
-    # Titulo
-    titulo_texto = cinema['location'].upper()
-    titulo = tk.Label(window, text = titulo_texto, font = ("Calibri", 30, "bold", "underline"), bg = '#2B2A33', fg = 'grey', anchor='center')
-    titulo.pack(pady = 15)
-    
-    # Boton pantalla principal
-    boton_pantalla_principal = tk.Button(window, text=">> Volver a pantalla principal", command= lambda : [window.withdraw(), pantalla_principal(compra)])
-    boton_pantalla_principal.configure(
-        relief=tk.RAISED,
-        bd=3,
-        font=('Calibri', 8, 'bold'),
-        foreground='#FFFFFF',
-        background='black',
-        padx=10,
-        pady=5,
-        anchor='center'
-    )
-    boton_pantalla_principal.pack(pady = 10)
-    
-    # Muestro la pelicula elegida
-    mostrar_pelicula(movie, window)
-    
-    # Muestro sala con boton de reserva
-    mostrar_sala(cinema, window, compra)
-
-    window.mainloop()
-
-
-def pantalla_checkout(window1,compra,dict_cart,list_names_snacks) -> None:
+def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks: list) -> None:
     
     window1.withdraw() # cierra la ventana de reserva
 
-    compra['cantidad_entradas'] = dict_cart['Asientos'][0]
+    sale['cantidad_entradas'] = dict_cart['Asientos'][0]
 
     for snack in list_names_snacks:
         if snack in dict_cart:
-            compra['snacks'] += [[ snack , dict_cart[snack][0] , dict_cart[snack][1] ]]
+            sale['snacks'] += [[ snack , dict_cart[snack][0] , dict_cart[snack][1] ]]
 
 
     total:float = 0.0
@@ -546,7 +525,7 @@ def pantalla_checkout(window1,compra,dict_cart,list_names_snacks) -> None:
     titulo_texto = ' 🛒 '
     titulo = tk.Label(window, text = titulo_texto, font = ("Calibri", 50, "bold"), bg= '#2B2A33', fg = 'white', anchor='center')
     titulo.pack(pady = 15)   
-    titulo_texto2 = ' RESUMEN DE COMPRA '
+    titulo_texto2 = ' RESUMEN DE sale '
     titulo2 = tk.Label(window, text = titulo_texto2, font = ("Calibri", 30, "bold"), bg= '#2B2A33', fg = 'white', anchor='center')
     titulo2.pack(pady = 15)
     
@@ -560,17 +539,17 @@ def pantalla_checkout(window1,compra,dict_cart,list_names_snacks) -> None:
     titulo_entradas_texto = ' ENTRADAS '
     titulo_entradas = tk.Label(entradas_canvas, text = titulo_entradas_texto, font = ("Calibri", 20, "bold"), bg = 'white', fg = 'black', anchor='center')
     titulo_entradas.pack(pady = 20)   
-    titulo_pelicula_texto = compra['nombre_pelicula']
+    titulo_pelicula_texto = sale['nombre_pelicula']
     titulo_pelicula = tk.Label(entradas_canvas, text = titulo_pelicula_texto, font = ("Calibri", 15, "bold"), bg= '#2B2A33', fg = 'white', anchor='center')
     titulo_pelicula.pack(pady = 5)
-    titulo_cantidad_entradas_texto = "- Entradas: " + str(compra['cantidad_entradas'])
+    titulo_cantidad_entradas_texto = "- Entradas: " + str(sale['cantidad_entradas'])
     titulo_cantidad_entradas = tk.Label(entradas_canvas, text = titulo_cantidad_entradas_texto, font = ("Calibri", 10), bg= '#2B2A33', fg = 'white', anchor='center')
     titulo_cantidad_entradas.pack(pady = 5)   
-    titulo_entradas_precio_texto = "- Precio Unitario: $" + str(compra['precio_entrada'])
+    titulo_entradas_precio_texto = "- Precio Unitario: $" + str(sale['precio_entrada'])
     titulo_entradas_precio = tk.Label(entradas_canvas, text = titulo_entradas_precio_texto, font = ("Calibri", 10), bg= '#2B2A33', fg = 'white', anchor='center')
     titulo_entradas_precio.pack(pady = 5)   
     
-    total_entradas = compra['cantidad_entradas']*compra['precio_entrada']
+    total_entradas = sale['cantidad_entradas']*sale['precio_entrada']
     
     titulo_entradas_total_texto = "TOTAL ENTRADAS: $" + str(total_entradas)
     titulo_entradas_total = tk.Label(entradas_canvas, text = titulo_entradas_total_texto, font = ("Calibri", 12, "bold"), bg = 'black', fg = 'white', anchor='center')
@@ -584,7 +563,7 @@ def pantalla_checkout(window1,compra,dict_cart,list_names_snacks) -> None:
     titulo_snacks = tk.Label(snacks_canvas, text = titulo_snacks_texto, font = ("Calibri", 20, "bold"), bg = 'white', fg = 'black', anchor='center')
     titulo_snacks.pack(pady = 20)
     
-    for snack in compra['snacks']:
+    for snack in sale['snacks']:
         titulo_snack_nombre_texto = "+ " + snack[0]
         titulo_snack_nombre = tk.Label(snacks_canvas, text = titulo_snack_nombre_texto, font = ("Calibri", 15, "bold"), bg= '#2B2A33', fg = 'white', anchor='center')
         titulo_snack_nombre.pack(pady = 10)
@@ -609,7 +588,7 @@ def pantalla_checkout(window1,compra,dict_cart,list_names_snacks) -> None:
     titulo_total = tk.Label(window, text = titulo_total_texto, font = ("Calibri", 25, "bold"), bg = 'black', fg = 'white', anchor='center')
     titulo_total.pack(pady = 30)  
     
-    boton_pagar = tk.Button(window, text="PAGAR", command= lambda:pantalla_pagar_final(window,compra))
+    boton_pagar = tk.Button(window, text="PAGAR", command= lambda:payment_window(window,sale))
     boton_pagar.configure(
         relief=tk.RAISED,
         bd=3,
@@ -622,7 +601,7 @@ def pantalla_checkout(window1,compra,dict_cart,list_names_snacks) -> None:
     boton_pagar.pack(pady = 15)
     
 
-def button_pay(compra,window2,dict_qr,card_number_input,expiry_input,security_code_input):
+def button_pay(sale: dict, window2: tk, dict_qr, card_number_input, expiry_input, security_code_input) -> None:
 
     card_number = str(card_number_input.get())
     expiry = str(expiry_input.get())
@@ -635,28 +614,28 @@ def button_pay(compra,window2,dict_qr,card_number_input,expiry_input,security_co
     else:
         locale.setlocale(locale.LC_ALL, '')
         fecha_actual = datetime.datetime.now()
-        timestamp_compra = fecha_actual.strftime('%d/%m/%Y %H:%M')
+        timestamp_sale = fecha_actual.strftime('%d/%m/%Y %H:%M')
 
 
-        compra['timestamp_compra'] = timestamp_compra
+        sale['timestamp_sale'] = timestamp_sale
 
         snacks_final = 0
-        for snack in compra['snacks']:
+        for snack in sale['snacks']:
             snacks_final += snack[2]
 
-        final_price_ = (int(compra['cantidad_entradas']) * int(compra['precio_entrada']) + snacks_final)
+        final_price_ = (int(sale['cantidad_entradas']) * int(sale['precio_entrada']) + snacks_final)
         
         id_qr = str(random.randint(1000, 9999)) + str(random.choice(string.ascii_letters))
 
-        compra['ID_QR'] = id_qr
+        sale['ID_QR'] = id_qr
         
-        string_qr = f'{id_qr}; {compra["nombre_pelicula"]}; {compra["ubicacion_totem"]}; {compra["cantidad_entradas"]}; {compra["timestamp_compra"]}; {final_price_}'
+        string_qr = f'{id_qr}; {sale["nombre_pelicula"]}; {sale["ubicacion_totem"]}; {sale["cantidad_entradas"]}; {sale["timestamp_sale"]}; {final_price_}'
 
         img = qrcode.make(string_qr)
         type(img)
         img.save("QR_GENERADO.png")
 
-        dict_ID_QR: dict = {f'{id_qr}': [f'{id_qr}',f'{compra["nombre_pelicula"]}',f'{compra["ubicacion_totem"]}',f'{compra["cantidad_entradas"]}',f'{compra["timestamp_compra"]}',f'${final_price_}']}
+        dict_ID_QR: dict = {f'{id_qr}': [f'{id_qr}',f'{sale["nombre_pelicula"]}',f'{sale["ubicacion_totem"]}',f'{sale["cantidad_entradas"]}',f'{sale["timestamp_sale"]}',f'${final_price_}']}
 
         with open('IDs_QR.json', 'r') as file_:
             data = json.load(file_)
@@ -666,11 +645,12 @@ def button_pay(compra,window2,dict_qr,card_number_input,expiry_input,security_co
         with open('IDs_QR.json', 'w') as outfile:
             json.dump(data, outfile, indent= 4)
 
-        messagebox.showinfo(message=f"Tu ID de compra es: {id_qr}", title="ID de compra")
+        messagebox.showinfo(message=f"Tu ID de sale es: {id_qr}", title="ID de sale")
 
         window2.withdraw() # cierra esta ventana
 
-def pantalla_pagar_final(window,compra):
+
+def payment_window(window: tk, sale: dict) -> None:
 
     window.withdraw() # cierra la primera ventana
 
@@ -728,7 +708,7 @@ def pantalla_pagar_final(window,compra):
     pay_button = tk.Button(
         window2, text='Pagar',
          font=(font_type,18),
-         command= lambda:button_pay(compra,window2,dict_qr,card_number_input,expiry_input,security_code_input),
+         command= lambda:button_pay(sale,window2,dict_qr,card_number_input,expiry_input,security_code_input),
          )
     pay_button.place(x=210,y= 400)
 
@@ -737,24 +717,24 @@ def pantalla_pagar_final(window,compra):
 
 def main() -> None:
     
-    # Diccionario que guarda toda la info correspondiente a la compra ha realizar. Se utiliza en todas las ventanas.
-    compra: dict = {
-        'ID_QR'             : '', # Este arrancatia vacio y se llena una vez realizada la compra y generado el QR
+    # Diccionario que guarda toda la info correspondiente a la sale ha realizar. Se utiliza en todas las ventanas.
+    sale: dict = {
+        'ID_QR'             : '', # Este arrancatia vacio y se llena una vez realizada la sale y generado el QR
         'ID_pelicula'       : '', # Pelicula elegida por el usuario en la pantalla principal
         'nombre_pelicula'   : '',
         'ubicacion_totem'   : '', # Cine elegido por el usuario en la pantalla principal
         'cantidad_entradas' : 0,
         'precio_entrada'    : 3000, # Este ya lo definimos aca hardcodeado
         'snacks'            : [],
-        'timestamp_compra'  : '' # Hora de la compra -> Cuando el usuario selecciona "comprar" en la pantalla checkout
+        'timestamp_sale'  : '' # Hora de la sale -> Cuando el usuario selecciona "saler" en la pantalla checkout
     }
 
     
     WINDOW.withdraw()
 
-    pantalla_principal(compra)
-    # pantalla_checkout(window_reserva, compra)
+    principal_window(sale)
 
     WINDOW.mainloop()
+
 
 main()

@@ -94,7 +94,7 @@ def get_movies_by_cinema(cinema_id: str) -> list[dict]:
         raise SystemExit('ERROR: ' + str(err))
 
 
-def stock_snacks() -> tuple[list, list, list, dict]:
+def get_stock_snacks() -> tuple[list, list, list, dict]:
 
         '''
         Los nombres y los precios por separado
@@ -122,14 +122,15 @@ def stock_snacks() -> tuple[list, list, list, dict]:
             list_ult.append(text)
 
         return list_names_snacks, list_prices_snacks, list_ult, stock_of_snacks
-        
-def get_poster_by_id(id: str) -> dict:
+
+
+def get_poster_by_id(id: str) -> str:
     try:
         endpoint: str = f'{URL}/posters/{id}'
         response = requests.get(endpoint, headers=AUTH)
         response.raise_for_status()
         poster: dict = response.json()
-        return poster
+        return poster['poster_image']
     except requests.exceptions.HTTPError as err:
         raise SystemExit('ERROR: ' + str(err))
-        
+
