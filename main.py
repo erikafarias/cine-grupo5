@@ -38,6 +38,7 @@ def change_cinema(cinema_id: str, movies_container: tk.Canvas, window: tk, sale:
     show_movies(movies, movies_container, window, sale)
     
     sale['ID_cinema'] = cinema_id
+    sale['ubicacion_totem'] = (endpoints.get_cinema_info_by_id(cinema_id))['location']
 
 
 def find_cinema_id_by_name(cinemas: list[dict], cinema_name: str) -> str:
@@ -156,6 +157,7 @@ def principal_window(sale: dict) -> None:
     
     # Guardo en el diccionario el cine elegido
     sale['ID_cinema'] = cinema_id.get()
+    sale['ubicacion_totem'] = selected_cinema.get()
 
     # posters
     movies_canvas = tk.Canvas(window, bg=bg_color, highlightbackground=bg_color)
@@ -233,13 +235,15 @@ def show_room_with_seats(cinema: dict, window: tk, sale: dict) -> None:
 
 
 def secondary_window(window_principal: tk, sale: dict, ID_movie: str) -> None:
-        
-    sale['ID_pelicula'] = ID_movie # Guardo el ID de la pelicula en el diccionario que viene del boton seleccionado
     
     window_principal.withdraw() # Cierra la ventana anterior
     
     cinema:dict = endpoints.get_cinema_info_by_id(sale['ID_cinema'])
-    movie:dict = endpoints.get_movie_by_id(sale['ID_pelicula'])
+    movie:dict = endpoints.get_movie_by_id(ID_movie)
+    
+    # Completo el dict con toda la data elegida por el ususario
+    sale['ID_pelicula'] = ID_movie
+    sale['nombre_pelicula'] = movie['name']
     
     window = tk.Toplevel()
     window.geometry("1280x720")
@@ -718,14 +722,15 @@ def main() -> None:
     
     # Diccionario que guarda toda la info correspondiente a la sale ha realizar. Se utiliza en todas las ventanas.
     sale: dict = {
-        'ID_QR'             : '', # Este arrancatia vacio y se llena una vez realizada la sale y generado el QR
-        'ID_pelicula'       : '', # Pelicula elegida por el usuario en la pantalla principal
+        'ID_QR'             : '',
+        'ID_pelicula'       : '',
         'nombre_pelicula'   : '',
-        'ubicacion_totem'   : '', # Cine elegido por el usuario en la pantalla principal
+        'ID_cinema'         : '',
+        'ubicacion_totem'   : '',
         'cantidad_entradas' : 0,
-        'precio_entrada'    : 3000, # Este ya lo definimos aca hardcodeado
+        'precio_entrada'    : 3000,
         'snacks'            : [],
-        'timestamp_sale'  : '' # Hora de la sale -> Cuando el usuario selecciona "saler" en la pantalla checkout
+        'timestamp_sale'    : ''
     }
 
     
@@ -733,7 +738,7 @@ def main() -> None:
 
     principal_window(sale)
 
-    WINDOW.mainloop()
+    # WINDOW.mainloop()
 
 
 main()
