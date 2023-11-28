@@ -4,7 +4,7 @@ import cv2
 from tkinter import messagebox
 
 
-def camera():
+def camera() -> None:
 
     capture = cv2.VideoCapture(0)
     result, image = capture.read()
@@ -28,7 +28,7 @@ def camera():
     cv2.destroyAllWindows()
 
 
-def id_code(entry_code,string_info_show=None):
+def id_code(entry_code,string_info_show=None) -> None:
     code = str(entry_code.get())
 
     with open('IDs_QR.json', 'r') as file_:
@@ -49,7 +49,8 @@ def id_code(entry_code,string_info_show=None):
 
     string_info_show['text'] = string_info
 
-def ventana():
+
+def ventana() -> None:
     window = tkinter.Tk()
     window.geometry('800x600')
     window.title('Lector QR')
@@ -98,7 +99,8 @@ def ventana():
     window.mainloop()
 
 
-
-def main():
+def main() -> None:
     ventana()
+
+
 main()
