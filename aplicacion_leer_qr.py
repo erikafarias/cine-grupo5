@@ -4,7 +4,7 @@ import cv2
 from tkinter import messagebox
 
 
-def camera():
+def camera() -> None:
     capture = cv2.VideoCapture(0)
     result, image = capture.read()
     if result:
@@ -27,7 +27,7 @@ def camera():
     cv2.destroyAllWindows()
 
 
-def id_code(entry_code):
+def id_code(entry_code) -> None:
     code = str(entry_code.get())
 
     with open('IDs_QR.json', 'r') as file_:
@@ -46,7 +46,7 @@ def id_code(entry_code):
         messagebox.showinfo(message=f"No hay un ID asociado", title="Error en el ID")
 
 
-def ventana():
+def ventana() -> None:
     bg_color = '#2b2a33'
     fg_color = '#ffffff'
 
