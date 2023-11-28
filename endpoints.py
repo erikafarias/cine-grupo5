@@ -61,7 +61,7 @@ def get_cinemas() -> list[dict]:
         raise SystemExit('ERROR: ' + str(err))
 
 
-def get_cinema_info_by_id(cinema_id:int) -> dict:
+def get_cinema_info_by_id(cinema_id: str) -> dict:
     
     '''
     Obtengo la informacion del cine.
