@@ -1,10 +1,9 @@
-import tkinter as tk
-from PIL import ImageTk
 import endpoints
 from utils import decodificar_imagen_base64
 
+import tkinter as tk
+from PIL import ImageTk
 from tkinter import ttk, messagebox
-from endpoints import *
 import datetime
 import locale
 import random, string
@@ -525,7 +524,7 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
     titulo_texto = ' 🛒 '
     titulo = tk.Label(window, text = titulo_texto, font = ("Calibri", 50, "bold"), bg= '#2B2A33', fg = 'white', anchor='center')
     titulo.pack(pady = 15)   
-    titulo_texto2 = ' RESUMEN DE sale '
+    titulo_texto2 = ' RESUMEN DE COMPRA '
     titulo2 = tk.Label(window, text = titulo_texto2, font = ("Calibri", 30, "bold"), bg= '#2B2A33', fg = 'white', anchor='center')
     titulo2.pack(pady = 15)
     
