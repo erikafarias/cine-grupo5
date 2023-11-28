@@ -5,7 +5,6 @@ from tkinter import messagebox
 
 
 def camera():
-
     capture = cv2.VideoCapture(0)
     result, image = capture.read()
     if result:
@@ -13,11 +12,11 @@ def camera():
         data, bbox, rectified_image = qr_detector.detectAndDecode(image)
 
         if data:
-            cv2.imshow('QR Code Reader', image)
             print(data)
             outfile = open('Ingresos.txt', 'a')
             outfile.write(f'\n{data}')
             outfile.close()
+            messagebox.showinfo(message="QR escaneado correctamente. Disfrute su película!", title="QR válido")
         else:
             messagebox.showinfo(message="No se pudo leer el QR", title="Error en lectura")
 
@@ -28,7 +27,7 @@ def camera():
     cv2.destroyAllWindows()
 
 
-def id_code(entry_code,string_info_show=None):
+def id_code(entry_code):
     code = str(entry_code.get())
 
     with open('IDs_QR.json', 'r') as file_:
@@ -39,66 +38,53 @@ def id_code(entry_code,string_info_show=None):
     if code in data:
         for element in data[code]:
             string_info += f'{element}; '
-
-    if code not in data:
+        outfile = open('Ingresos.txt', 'a')
+        outfile.write(string_info)
+        outfile.close()
+        messagebox.showinfo(message="Se validó correctamente el ID. Disfrute su película", title="ID válido")
+    else:
         messagebox.showinfo(message=f"No hay un ID asociado", title="Error en el ID")
- 
-    outfile = open('Ingresos.txt', 'a')
-    outfile.write(string_info)
-    outfile.close()
 
-    string_info_show['text'] = string_info
 
 def ventana():
+    bg_color = '#2b2a33'
+    fg_color = '#ffffff'
+
     window = tkinter.Tk()
     window.geometry('800x600')
     window.title('Lector QR')
     window.resizable(False, False)
-    window.configure(bg='#2b2a33')
+    window.configure(bg=bg_color)
     font_type = 'Calibri'
 
-    # titulo2
-    text1 = tkinter.Label(window, text='Lector QR', bg='#2b2a33',fg='#ffffff' , font=(font_type,20))
-    text1.place(x=330, y=100)
-    
-    text2 = tkinter.Label(window, text='Ingresando el ID', bg='#2b2a33',fg='#ffffff' , font=(font_type,20))
-    text2.place(x=100,y=200)
+    title = tkinter.Label(window, text='Lector QR', bg='#2b2a33', fg='#ffffff', font=(font_type, 22, 'bold'))
+    title.place(x=330, y=100)
 
-    text3 = tkinter.Label(
-        window, 
-        text='Escaneando el codigo QR', 
-        bg='#2b2a33',
-        fg='#ffffff', 
-        font=(font_type,20))
+    option_id = tkinter.Label(window, text='Ingresando el ID', bg='#2b2a33', fg='#ffffff', font=(font_type, 18, 'bold'))
+    option_id.place(x=100, y=200)
 
-    text3.place(x=470,y=200)
+    option_qr = tkinter.Label(window, text='Escaneando el codigo QR', bg=bg_color, fg=fg_color,
+                              font=(font_type, 18, 'bold'))
+    option_qr.place(x=470, y=200)
 
+    entry_id = tkinter.Entry(window, width=5, font=(font_type, 14), bg=bg_color, fg=fg_color)
+    entry_id.place(x=100, y=285)
+    entry_id.insert(0, '0000A')
 
-    # input id
-    entry_code = tkinter.Entry(window, width=5 , font=(font_type,15))
-    entry_code.place(x=140, y=280)
-    entry_code.insert(0, '0000A')
-    
-    # info
+    button_id = tkinter.Button(window, text='Ingresar', command=lambda: id_code(entry_id))
+    button_id.configure(font=(font_type, 14, 'bold'), bg=bg_color, fg=fg_color, pady=0, highlightbackground=bg_color)
+    button_id.place(x=170, y=282)
 
-    string_info_show = tkinter.Label(window, font=(font_type,15))
-    string_info_show.place(x=170,y=450)
-
-
-    # boton id
-    button_id = tkinter.Button(window, text='Ingresar', command=lambda: id_code(entry_code,string_info_show))
-    button_id.place(x=210,y=282)
-
-    # boton camara
-
-    button_camara = tkinter.Button(window, text="Escanear con la camara", command=lambda:camera())
-    button_camara.place(x=530, y=282)
-
+    button_camera = tkinter.Button(window, text="Escanear con la camara", command=camera)
+    button_camera.configure(font=(font_type, 14, 'bold'), bg=bg_color, fg=fg_color, pady=0,
+                            highlightbackground=bg_color)
+    button_camera.place(x=500, y=282)
 
     window.mainloop()
 
 
-
 def main():
     ventana()
+
+
 main()
