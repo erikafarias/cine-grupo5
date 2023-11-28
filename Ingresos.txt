@@ -1,1 +1,1 @@
-ID_code, Nombre_pelicula, Ubicacion_totem, Cantidad_entradas, timestamp, Precio_final,  
+ID_code; Nombre_pelicula; Ubicacion_totem; Cantidad_entradas; timestamp; Precio_final;

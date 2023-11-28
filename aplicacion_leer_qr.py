@@ -4,17 +4,25 @@ import cv2
 from tkinter import messagebox
 
 
-def camera(): # probar si funciona
+def camera():
 
     capture = cv2.VideoCapture(0)
+    result, image = capture.read()
+    if result:
+        qr_detector = cv2.QRCodeDetector()
+        data, bbox, rectified_image = qr_detector.detectAndDecode(image)
 
-    while(capture.isOpened()):
-        ret, frame = capture.read()
-    
-        qrDetector = cv2.QRCodeDetector()
-        data, bbox, rectifiedImage = qrDetecte.detectAndDecode(frame)
+        if data:
+            cv2.imshow('QR Code Reader', image)
+            print(data)
+            outfile = open('Ingresos.txt', 'a')
+            outfile.write(f'\n{data}')
+            outfile.close()
+        else:
+            messagebox.showinfo(message="No se pudo leer el QR", title="Error en lectura")
 
-        print(data)
+    else:
+        messagebox.showinfo(message=f"No se pudo capturar la imagen", title="Error en captura")
 
     capture.release()
     cv2.destroyAllWindows()
@@ -30,7 +38,7 @@ def id_code(entry_code,string_info_show=None):
 
     if code in data:
         for element in data[code]:
-            string_info += f'{element}, '
+            string_info += f'{element}; '
 
     if code not in data:
         messagebox.showinfo(message=f"No hay un ID asociado", title="Error en el ID")
