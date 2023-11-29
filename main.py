@@ -16,6 +16,13 @@ WINDOW = tk.Tk()
 
 
 def find_movies_by_cinema(cinema_id: str) -> list[dict]:
+    """
+    Dado un cinema_id busca los id de películas correspondientes a ese cine y las compara con la lista de todas las
+    películas. Devuelve la lista de diccionarios de las películas correspondientes al cine.
+
+    Given a cinema_id, gets all the movies' ids for that cinema and matches them with the movies list.
+    Returns the movies dict list for that cinema.
+    """
     movies_by_cinema: list[dict] = endpoints.get_movies_by_cinema(cinema_id)
     all_movies: list[dict] = endpoints.get_movies()
     movies: list[dict] = []
@@ -27,6 +34,11 @@ def find_movies_by_cinema(cinema_id: str) -> list[dict]:
 
 
 def list_cinemas_names(cinemas: list[dict]) -> list[str]:
+    """
+    Dada la lista de diccionarios con la información de los cines, devuelve una lista de sus nombres
+
+    Given a cinemas dict list, returns a list of their names
+    """
     cinemas_names: list[str] = []
     for cinema in cinemas:
         cinemas_names.append(cinema['location'])
@@ -35,6 +47,11 @@ def list_cinemas_names(cinemas: list[dict]) -> list[str]:
 
 
 def change_cinema(cinema_id: str, movies_container: tk.Canvas, window: tk, sale: dict) -> None:
+    """
+    Método encargado de mostrar las películas al momento de cambiar de cine en la pantalla principal
+
+    Method responsible for showing movies when changing the cinema on the main screen
+    """
     movies: list[dict] = find_movies_by_cinema(cinema_id)
     show_movies(movies, movies_container, window, sale)
 
@@ -43,17 +60,33 @@ def change_cinema(cinema_id: str, movies_container: tk.Canvas, window: tk, sale:
 
 
 def find_cinema_id_by_name(cinemas: list[dict], cinema_name: str) -> str:
+    """
+    Dada una lista de cines y el nombre de uno de ellos, devuelve el id del cine que lleva ese nombre
+
+    Given a list of cinemas and the name of one of them, returns the cinema's id that matches the name
+    """
     for c in cinemas:
         if cinema_name == c['location']:
             return c['cinema_id']
 
 
 def update_cinema_id(cinema_name: str, cinema_id: tk.StringVar, cinemas_list: list) -> None:
+    """
+    Este método es responsable de cambiar el cinema_id cuando el cine seleccionado cambia
+
+    This method is responsible for changing the cinema id when the selected cinema changes
+    """
     cinema_id.set(find_cinema_id_by_name(cinemas_list, cinema_name))
 
 
 def find_movie_by_name(movie_name: str, cinema_id: str, movies_canvas: tk.Canvas, entry: tk.Entry, window: tk,
                        sale: dict) -> list[dict]:
+    """
+    Este método es responsable de buscar una película cuando se ingresa su nombre en el buscador y mostrar el resultado.
+
+    This method is responsible for searching for a movie when its name is entered in the search bar and displaying
+    the result.
+    """
     movies: list[dict] = find_movies_by_cinema(cinema_id)
     movies_found: list[dict] = []
 
@@ -77,6 +110,11 @@ def find_movie_by_name(movie_name: str, cinema_id: str, movies_canvas: tk.Canvas
 
 
 def show_movies(movies: list[dict], movies_canvas: tk.Canvas, window: tk, sale: dict) -> None:
+    """
+    Método encargado de mostrar las películas correspondientes al cine seleccionado
+
+    Method responsible for showing the movies corresponding to the selected cinema
+    """
     number_of_movies: int = len(movies)
     NUMBER_OF_COLUMNS: int = 4
     number_of_rows: int = round(number_of_movies / NUMBER_OF_COLUMNS) + 1
@@ -115,6 +153,11 @@ def show_movies(movies: list[dict], movies_canvas: tk.Canvas, window: tk, sale: 
 
 
 def principal_window(sale: dict) -> None:
+    """
+    Método encargado de mostrar la pantalla principal donde se muestran todas las películas
+
+    Method responsible for showing the main window where all movies are displayed
+    """
     bg_color = '#2B2A33'
     fg_color = '#FFFFFF'
 
@@ -175,6 +218,11 @@ def principal_window(sale: dict) -> None:
 
 
 def show_movie_info(movie: dict, window: tk) -> None:
+    """
+    Método encargado de mostrar la información de la película seleccionada en la pantalla secundaria
+
+    Method responsible for showing the selected movie's information on the secondary window
+    """
     frame_movie = tk.Frame(window, bg='#2B2A33')
     frame_movie.pack(pady=10)
     poster_base64_movie = endpoints.get_poster_by_id(movie['poster_id'])
@@ -187,44 +235,53 @@ def show_movie_info(movie: dict, window: tk) -> None:
     movie_info_frame = tk.Frame(frame_movie, bg='#2B2A33')
     movie_name = movie['name']
     movie_name_label = tk.Label(movie_info_frame, text=movie_name, font=('Calibri', 18, "bold"), bg='#2B2A33',
-                               fg='#FFFFFF', anchor='center')
+                                fg='#FFFFFF', anchor='center')
     movie_name_label.pack(pady=(30, 10))
 
     synopsis = movie['synopsis']
-    synopsis_label = tk.Label(movie_info_frame, text=synopsis, font=('Calibri', 10, 'italic'), bg='#2B2A33', fg='#FFFFFF',
-                        wraplength=600, justify='center')
+    synopsis_label = tk.Label(movie_info_frame, text=synopsis, font=('Calibri', 10, 'italic'), bg='#2B2A33',
+                              fg='#FFFFFF',
+                              wraplength=600, justify='center')
     synopsis_label.pack(pady=5)
 
     duration = movie['duration']
-    duration_label = tk.Label(movie_info_frame, text=duration, font=('Calibri', 10), bg='#2B2A33', fg='#FFFFFF', anchor='center')
+    duration_label = tk.Label(movie_info_frame, text=duration, font=('Calibri', 10), bg='#2B2A33', fg='#FFFFFF',
+                              anchor='center')
     duration_label.pack(pady=5)
 
     actors = movie['actors']
-    actors_label = tk.Label(movie_info_frame, text=actors, font=('Calibri', 10), bg='#2B2A33', fg='#FFFFFF', anchor='center')
+    actors_label = tk.Label(movie_info_frame, text=actors, font=('Calibri', 10), bg='#2B2A33', fg='#FFFFFF',
+                            anchor='center')
     actors_label.pack(pady=5)
 
     genre = movie['gender']
     genre_label = tk.Label(movie_info_frame, text=genre, font=('Calibri', 10, 'bold'), bg='#2B2A33', fg='#FFFFFF',
-                      anchor='center')
+                           anchor='center')
     genre_label.pack(pady=5)
 
     rating = movie['rating']
     rating_label = tk.Label(movie_info_frame, text=rating, font=('Calibri', 10, 'bold'), bg='#2B2A33', fg='#FFFFFF',
-                      anchor='center')
+                            anchor='center')
     rating_label.pack(pady=5)
     movie_info_frame.pack(side='right')
 
 
 def show_room_with_seats(cinema: dict, window: tk, sale: dict) -> None:
+    """
+    Método encargado de mostrar los asientos disponibles para ese cine
+
+    Method responsible for showing the available seats in that cinema
+    """
     seats = "Asientos disponibles:    " + str(cinema['available_seats'])
     seats_label = tk.Label(window, text=seats, font=('Calibri', 10, 'italic'), bg='#2B2A33', fg='#FFFFFF',
-                        highlightthickness=1, padx=10)
+                           highlightthickness=1, padx=10)
     seats_label.pack(pady=(60, 10))
 
     if cinema['available_seats'] > 0:
 
         available_seats = int(cinema['available_seats'])
-        button_book = tk.Button(window, text="RESERVAR", command=lambda: reservation_window(sale, window,available_seats))
+        button_book = tk.Button(window, text="RESERVAR",
+                                command=lambda: reservation_window(sale, window, available_seats))
         button_book.configure(
             relief=tk.RAISED,
             bd=3,
@@ -244,6 +301,11 @@ def show_room_with_seats(cinema: dict, window: tk, sale: dict) -> None:
 
 
 def secondary_window(window_principal: tk, sale: dict, ID_movie: str) -> None:
+    """
+    Método encargado de mostrar la pantalla secundaria
+
+    Method responsible for showing the secondary window
+    """
     window_principal.withdraw()  # Cierra la ventana anterior
 
     cinema: dict = endpoints.get_cinema_info_by_id(sale['ID_cinema'])
@@ -260,11 +322,11 @@ def secondary_window(window_principal: tk, sale: dict, ID_movie: str) -> None:
 
     title = cinema['location'].upper()
     title_label = tk.Label(window, text=title, font=("Calibri", 30, "bold", "underline"), bg='#2B2A33', fg='grey',
-                      anchor='center')
+                           anchor='center')
     title_label.pack(pady=15)
 
     button_principal_window = tk.Button(window, text=">> Volver a pantalla principal",
-                                       command=lambda: [window.withdraw(), principal_window(sale)])
+                                        command=lambda: [window.withdraw(), principal_window(sale)])
     button_principal_window.configure(
         relief=tk.RAISED,
         bd=3,
@@ -283,51 +345,72 @@ def secondary_window(window_principal: tk, sale: dict, ID_movie: str) -> None:
     window.mainloop()
 
 
-def price_per_ticket(number_box, price, final_price_ticket, text_value=None) -> None:
+def price_per_ticket(number_box, price, text_value=None) -> None:
+    """
+    Método encargado de calcular y mostrar el precio final de las entradas
+
+    Method responsible for calculating and showing the tickets' final price
+    """
     number = int(number_box.get())
 
-    if number == 1:
-        final_price_ticket = price
-
-    else:
-        final_price_ticket: float = (number * price)
+    final_price_ticket: float = (number * price)
 
     text_value['text'] = f"${final_price_ticket}"
 
 
-def add_to_cart(number_snack, snacks_box, dict_cart, text_value_2, stock_of_snacks, price, number_box, final) -> None:
-    number_snacks = int(number_snack.get())
-    snack = str(snacks_box.get())
-    # print(snack, number_snacks)
+def show_items_in_cart(dict_cart, text_value_2) -> None:
+    """
+    Método encargado de mostrar los productos en el carrito y el precio final
 
-    price_snack = float(stock_of_snacks[snack])  # precio c/u
-    price_final_snack = (price_snack * number_snacks)
-    # print(price_snack,price_final_snack)
-    dict_cart[snack] = (number_snacks, price_final_snack)
-
+    Method responsible for showing the items in the cart and the final price
+    """
     final_price: int = 0
-
-    if number_snacks == 0:
-        del dict_cart[snack]
 
     for key in dict_cart:
         price = float(dict_cart[key][1])
         final_price += price
 
-    final.append(final_price)
-    # print(dict_cart)
     text_value_2['text'] = f"{dict_cart} : ${final_price}"
 
 
-def ticket_confirm(dict_cart, number_box, price, final_price_ticket) -> None:
-    number_tickets = number_box.get()
-    number_tickets = int(number_tickets)
+def add_to_cart(number_snack, snacks_box, dict_cart, text_value_2, stock_of_snacks) -> None:
+    """
+    Método encargado de agregar al carrito los snacks y calcular su precio
 
+    Method responsible for adding the snacks to the cart and calculating their price
+    """
+    number_snacks = int(number_snack.get())
+    snack = str(snacks_box.get())
+
+    price_snack = float(stock_of_snacks[snack])
+    price_final_snack = (price_snack * number_snacks)
+    dict_cart[snack] = (number_snacks, price_final_snack)
+
+    if number_snacks == 0:
+        del dict_cart[snack]
+
+    show_items_in_cart(dict_cart, text_value_2)
+
+
+def ticket_confirm(dict_cart, number_box, price, text_value_2) -> None:
+    """
+    Método encargado de agregar al carrito la cantidad de entradas seleccionadas
+
+    Method responsible for adding to the cart the number of tickets selected
+    """
+    number_tickets = int(number_box.get())
     final_price_ticket = (number_tickets * price)
     dict_cart['Asientos'] = (number_tickets, final_price_ticket)
 
+    show_items_in_cart(dict_cart, text_value_2)
+
 
 def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
+    """
+    Método encargado de mostrar la pantalla de reserva. Se muestran los snacks y las entradas y se agregan al carrito
+
+    Method responsible for showing the reservation window. It shows the tickets and snacks and add them to the cart
+    """
     window.withdraw()
 
     window1 = tk.Tk()
@@ -339,11 +422,8 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
 
     price = float(sale['precio_entrada'])
     list_names_snacks, list_prices_snacks, list_ult, stock_of_snacks = endpoints.get_stock_snacks()
-    final = []
     dict_cart: dict = {}
-    final_price_ticket: int = 0
 
-    # titulo principal
     title = tk.Label(
         window1,
         text="Pantalla de reserva",
@@ -356,7 +436,6 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
 
     title.place(x=450, y=50)
 
-    # titulo secundario asientos
     second_title = tk.Label(
         window1,
         text="Cantidad de entradas",
@@ -369,7 +448,6 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
 
     second_title.place(x=105, y=150)
 
-    # input numero de asientos
     current_value = tk.IntVar()
     number_box = tk.Spinbox(
         window1,
@@ -379,7 +457,7 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
         wrap=True,
         state="readonly",
         font=(font_type, 15),
-        command=lambda: price_per_ticket(number_box, price, final_price_ticket, text_value)
+        command=lambda: price_per_ticket(number_box, price, text_value)
     )
 
     number_box.place(
@@ -389,7 +467,6 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
         height=30
     )
 
-    # precio de las entradas
     text_value = tk.Label(
         window1,
         text="$0.0",
@@ -399,17 +476,15 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
     )
     text_value.place(x=170, y=230)
 
-    # boton confirmar aisnetos
     confirm_tickets = tk.Button(
         window1,
         text="Confirmar entradas",
         font=(font_type, 18),
-        command=lambda: ticket_confirm(dict_cart, number_box, price, final_price_ticket)
+        command=lambda: ticket_confirm(dict_cart, number_box, price, text_value_2)
     )
 
     confirm_tickets.place(x=210, y=300)
 
-    # tercer titulo snacks
     tird_title = tk.Label(
         window1,
         text="Agregar Snacks",
@@ -422,7 +497,6 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
 
     tird_title.place(x=480, y=148)
 
-    # input snaks
     current_var = tk.StringVar()
     snacks_box = ttk.Combobox(
         window1,
@@ -438,7 +512,6 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
         y=230
     )
 
-    # titulos precios
     text_prices = tk.Label(
         window1,
         text="Lista de precios",
@@ -451,12 +524,10 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
 
     text_prices.place(x=900, y=148)
 
-    # precios snacks
     list_prices = tk.Listbox(window1, font=(font_type, 18), width=25, height=7)  # height define el numero de filas
     list_prices.insert(0, *list_ult)
     list_prices.place(x=960, y=210)
 
-    # numero del snack
     number_of_snacks = tk.IntVar()
     number_snack = tk.Spinbox(
         window1,
@@ -475,13 +546,11 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
         height=30
     )
 
-    # boton agregar snack
     add_botton = tk.Button(
         window1,
         text="¡Agregar al carrito!",
         font=(font_type, 18),
-        command=lambda: add_to_cart(number_snack, snacks_box, dict_cart, text_value_2, stock_of_snacks, price,
-                                    number_box, final),
+        command=lambda: add_to_cart(number_snack, snacks_box, dict_cart, text_value_2, stock_of_snacks),
     )
 
     add_botton.place(
@@ -489,11 +558,9 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
         y=300
     )
 
-    # mostrar carrito
     text_value_2 = tk.Label(window1, font=(font_type, 13))
     text_value_2.place(x=20, y=450)
 
-    # boton pagar
     final_button = tk.Button(
         window1,
         font=(font_type, 18),
@@ -506,6 +573,11 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
 
 
 def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks: list) -> None:
+    """
+    Método encargado de mostrar los artículos del carrito antes de pagarlos
+
+    Method responsible for showing the items in the cart before the paying stage
+    """
     window1.withdraw()
 
     sale['cantidad_entradas'] = dict_cart['Asientos'][0]
@@ -514,8 +586,6 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
         if snack in dict_cart:
             sale['snacks'] += [[snack, dict_cart[snack][0], dict_cart[snack][1]]]
 
-    total: float = 0.0
-    total_tickets: float = 0.0
     total_snacks: float = 0.0
 
     window = tk.Tk(screenName='Pantalla Checkout')
@@ -526,11 +596,11 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
     # Titulo
     title = ' 🛒 '
     title_label = tk.Label(window, text=title, font=("Calibri", 50, "bold"), bg='#2B2A33', fg='white',
-                      anchor='center')
+                           anchor='center')
     title_label.pack(pady=15)
     title_2 = ' RESUMEN DE COMPRA '
     title_2_label = tk.Label(window, text=title_2, font=("Calibri", 30, "bold"), bg='#2B2A33', fg='white',
-                       anchor='center')
+                             anchor='center')
     title_2_label.pack(pady=15)
 
     canvas = tk.Canvas(window, bg='#2B2A33', highlightbackground='#2B2A33')
@@ -541,26 +611,26 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
 
     title_tickets = ' ENTRADAS '
     title_tickets_label = tk.Label(tickets_canvas, text=title_tickets, font=("Calibri", 20, "bold"), bg='white',
-                               fg='black', anchor='center')
+                                   fg='black', anchor='center')
     title_tickets_label.pack(pady=20)
     movie_title = sale['nombre_pelicula']
     movie_title_label = tk.Label(tickets_canvas, text=movie_title, font=("Calibri", 15, "bold"), bg='#2B2A33',
-                               fg='white', anchor='center')
+                                 fg='white', anchor='center')
     movie_title_label.pack(pady=5)
     number_of_tickets = "- Entradas: " + str(sale['cantidad_entradas'])
     number_of_tickets_label = tk.Label(tickets_canvas, text=number_of_tickets, font=("Calibri", 10),
-                                        bg='#2B2A33', fg='white', anchor='center')
+                                       bg='#2B2A33', fg='white', anchor='center')
     number_of_tickets_label.pack(pady=5)
     title_tickets_price = "- Precio Unitario: $" + str(sale['precio_entrada'])
     title_tickets_price_label = tk.Label(tickets_canvas, text=title_tickets_price, font=("Calibri", 10),
-                                      bg='#2B2A33', fg='white', anchor='center')
+                                         bg='#2B2A33', fg='white', anchor='center')
     title_tickets_price_label.pack(pady=5)
 
-    total_tickets = sale['cantidad_entradas'] * sale['precio_entrada']
+    total_tickets: float = sale['cantidad_entradas'] * sale['precio_entrada']
 
     title_total_tickets = "TOTAL ENTRADAS: $" + str(total_tickets)
     title_total_tickets_label = tk.Label(tickets_canvas, text=title_total_tickets, font=("Calibri", 12, "bold"),
-                                     bg='black', fg='white', anchor='center')
+                                         bg='black', fg='white', anchor='center')
     title_total_tickets_label.pack(pady=(10, 25))
 
     # Snacks
@@ -569,34 +639,34 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
 
     title_snacks = ' SNACKS '
     title_snacks_label = tk.Label(snacks_canvas, text=title_snacks, font=("Calibri", 20, "bold"), bg='white',
-                             fg='black', anchor='center')
+                                  fg='black', anchor='center')
     title_snacks_label.pack(pady=20)
 
     for snack in sale['snacks']:
         snack_name = "+ " + snack[0]
         snack_name_label = tk.Label(snacks_canvas, text=snack_name, font=("Calibri", 15, "bold"),
-                                       bg='#2B2A33', fg='white', anchor='center')
+                                    bg='#2B2A33', fg='white', anchor='center')
         snack_name_label.pack(pady=10)
         snack_quantity = "Cantidad: " + str(snack[1])
         snack_quantity_label = tk.Label(snacks_canvas, text=snack_quantity, font=("Calibri", 10),
-                                          bg='#2B2A33', fg='white', anchor='center')
+                                        bg='#2B2A33', fg='white', anchor='center')
         snack_quantity_label.pack(pady=5)
         snack_price = "Precio: $" + str(snack[2])
         snack_price_label = tk.Label(snacks_canvas, text=snack_price, font=("Calibri", 10),
-                                       bg='#2B2A33', fg='white', anchor='center')
+                                     bg='#2B2A33', fg='white', anchor='center')
         snack_price_label.pack(pady=5)
 
         total_snacks += snack[2]
 
     title_total_snacks = "TOTAL SNACKS: $" + str(total_snacks)
     title_total_snacks_label = tk.Label(snacks_canvas, text=title_total_snacks, font=("Calibri", 12, "bold"),
-                                   bg='black', fg='white', anchor='center')
+                                        bg='black', fg='white', anchor='center')
     title_total_snacks_label.pack(pady=(10, 25))
 
-    total = total_tickets + total_snacks
+    total: float = total_tickets + total_snacks
     total_text = ' TOTAL: $' + str(total)
     total_label = tk.Label(window, text=total_text, font=("Calibri", 25, "bold"), bg='black', fg='white',
-                            anchor='center')
+                           anchor='center')
     total_label.pack(pady=30)
 
     pay_button = tk.Button(window, text="PAGAR", command=lambda: payment_window(window, sale))
@@ -613,6 +683,13 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
 
 
 def generate_QR_pdf(info: str) -> None:
+    """
+    Método encargado de generar el código QR con la información de la compra.
+    Guarda este QR como imagen y como archivo pdf
+
+    Method responsible of generating the QR code with the purchase information.
+    It saves the QR as an image and a pdf file
+    """
     img_qr = qrcode.make(info)
     img_qr.save("QR_GENERADO.png")
 
@@ -621,7 +698,12 @@ def generate_QR_pdf(info: str) -> None:
         qr_image.save(pdf_file, "pdf")
 
 
-def button_pay(sale: dict, window2: tk, dict_qr, card_number_input, expiry_input, security_code_input) -> None:
+def button_pay(sale: dict, window2: tk, card_number_input, expiry_input, security_code_input) -> None:
+    """
+    Dados los datos del medio de pago, los valida y si son correctos finaliza la compra
+
+    Given the payment information, it validates them and if they are correct, concretes the purchase
+    """
     card_number = str(card_number_input.get())
     expiry = str(expiry_input.get())
     security_code = str(security_code_input.get())
@@ -670,6 +752,11 @@ def button_pay(sale: dict, window2: tk, dict_qr, card_number_input, expiry_input
 
 
 def payment_window(window: tk, sale: dict) -> None:
+    """
+    Método encargado de mostrar la pantalla de pago donde se ingresaran los datos del medio de pago elegido
+
+    Method responsible for displaying the payment window, where the payment information will be entered
+    """
     window.withdraw()
 
     window2 = tk.Tk()
@@ -679,7 +766,6 @@ def payment_window(window: tk, sale: dict) -> None:
     window2.configure(bg='#2b2a33')
 
     font_type = 'Calibri'
-
 
     payment_methods_label = tk.Label(window2, text='Metodos de pago', font=(font_type, 18), bg='#2b2a33', fg='#ffffff')
     payment_methods_label.place(x=160, y=50)
@@ -696,7 +782,6 @@ def payment_window(window: tk, sale: dict) -> None:
     )
 
     payment_methods.place(x=170, y=100)
-
 
     card_number_label = tk.Label(window2, text="Numero de tarjeta", bg='#2b2a33', fg='#ffffff', font=(font_type, 18))
     card_number_label.place(x=160, y=150)
@@ -720,11 +805,10 @@ def payment_window(window: tk, sale: dict) -> None:
     expiry_input.place(x=350, y=300)
     expiry_input.insert(0, "MM/AA")
 
-    dict_qr: dict = {}  # diccio solo para generar el qr
     pay_button = tk.Button(
         window2, text='Pagar',
         font=(font_type, 18),
-        command=lambda: button_pay(sale, window2, dict_qr, card_number_input, expiry_input, security_code_input),
+        command=lambda: button_pay(sale, window2, card_number_input, expiry_input, security_code_input),
     )
     pay_button.place(x=210, y=400)
 
@@ -732,7 +816,6 @@ def payment_window(window: tk, sale: dict) -> None:
 
 
 def main() -> None:
-    # Diccionario que guarda toda la info correspondiente a la sale ha realizar. Se utiliza en todas las ventanas.
     sale: dict = {
         'ID_QR': '',
         'ID_pelicula': '',
