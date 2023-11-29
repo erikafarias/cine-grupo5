@@ -670,9 +670,9 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
         snack_quantity_label.grid(row=index, column=1, pady=5, padx=5)
 
         snack_price = "Precio: $" + str(snack[2])
-        snack_price_label = tk.Label(snacks_canvas, text=snack_price, font=("Calibri", 10),
+        snack_price_label = tk.Label(snacks_frame, text=snack_price, font=("Calibri", 10),
                                      bg='#2B2A33', fg='white', anchor='center')
-        snack_price_label.grid(row=index, column=3, pady=5, padx=5)
+        snack_price_label.grid(row=index, column=2, pady=5, padx=5)
 
         total_snacks += snack[2]
         index += 1
