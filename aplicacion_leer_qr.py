@@ -39,7 +39,7 @@ def id_code(entry_code) -> None:
         for element in data[code]:
             string_info += f'{element}; '
         outfile = open('Ingresos.txt', 'a')
-        outfile.write(string_info)
+        outfile.write(f'\n{string_info}')
         outfile.close()
         messagebox.showinfo(message="Se validó correctamente el ID. Disfrute su película", title="ID válido")
     else:

@@ -637,7 +637,6 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
 
 def generate_QR_pdf(info: str) -> None:
     img_qr = qrcode.make(info)
-    type(img_qr)
     img_qr.save("QR_GENERADO.png")
 
     with open('QR_generado.pdf', 'wb') as pdf_file:
