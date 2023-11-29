@@ -238,8 +238,9 @@ def show_movie_info(movie: dict, window: tk) -> None:
     movie_name_label.pack(pady=(30, 10))
 
     synopsis = movie['synopsis']
-    synopsis_label = tk.Label(movie_info_frame, text=synopsis, font=('Calibri', 10, 'italic'), bg='#2B2A33', fg='#FFFFFF',
-                        wraplength=500, justify='center')
+    synopsis_label = tk.Label(movie_info_frame, text=synopsis, font=('Calibri', 10, 'italic'), bg='#2B2A33',
+                              fg='#FFFFFF',
+                              wraplength=500, justify='center')
     synopsis_label.pack(pady=5, padx=10)
 
     duration = movie['duration']
@@ -588,8 +589,6 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
         if snack in dict_cart:
             sale['snacks'] += [[snack, dict_cart[snack][0], dict_cart[snack][1]]]
 
-    total: int = 0
-    total_tickets: int = 0
     total_snacks: int = 0
 
     window = tk.Tk(screenName='Pantalla Checkout')
@@ -618,26 +617,26 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
 
     title_tickets = ' ENTRADAS '
     title_tickets_label = tk.Label(tickets_frame, text=title_tickets, font=("Calibri", 20, "bold"), bg='white',
-                               fg='black', anchor='center')
+                                   fg='black', anchor='center')
     title_tickets_label.pack(pady=20)
     movie_title = sale['nombre_pelicula']
     movie_title_label = tk.Label(tickets_frame, text=movie_title, font=("Calibri", 15, "bold"), bg='#2B2A33',
-                               fg='white', anchor='center')
+                                 fg='white', anchor='center')
     movie_title_label.pack(pady=5)
     number_of_tickets = "- Entradas: " + str(sale['cantidad_entradas'])
     number_of_tickets_label = tk.Label(tickets_frame, text=number_of_tickets, font=("Calibri", 10),
-                                        bg='#2B2A33', fg='white', anchor='center')
+                                       bg='#2B2A33', fg='white', anchor='center')
     number_of_tickets_label.pack(pady=5)
     title_tickets_price = "- Precio Unitario: $" + str(sale['precio_entrada'])
     title_tickets_price_label = tk.Label(tickets_frame, text=title_tickets_price, font=("Calibri", 10),
-                                      bg='#2B2A33', fg='white', anchor='center')
+                                         bg='#2B2A33', fg='white', anchor='center')
     title_tickets_price_label.pack(pady=5)
 
     total_tickets: float = sale['cantidad_entradas'] * sale['precio_entrada']
 
     title_total_tickets = "TOTAL ENTRADAS: $" + str(total_tickets)
     title_total_tickets_label = tk.Label(tickets_frame, text=title_total_tickets, font=("Calibri", 12, "bold"),
-                                     bg='black', fg='white', anchor='center')
+                                         bg='black', fg='white', anchor='center')
     title_total_tickets_label.pack(pady=(10, 25))
 
     # Snacks
@@ -654,33 +653,33 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
 
     title_snacks = ' SNACKS '
     title_snacks_label = tk.Label(snacks_frame, text=title_snacks, font=("Calibri", 20, "bold"), bg='white',
-                             fg='black', anchor='center')
+                                  fg='black', anchor='center')
     title_snacks_label.grid(row=0, column=1, pady=20)
 
-    index:int = 1
+    index: int = 1
 
     for snack in sale['snacks']:
         snack_name = "+ " + snack[0]
         snack_name_label = tk.Label(snacks_frame, text=snack_name, font=("Calibri", 15, "bold"),
-                                        bg='#2B2A33', fg='white', anchor='center')
+                                    bg='#2B2A33', fg='white', anchor='center')
         snack_name_label.grid(row=index, column=0, pady=10, padx=5)
 
         snack_quantity = "Cantidad: " + str(snack[1])
         snack_quantity_label = tk.Label(snacks_frame, text=snack_quantity, font=("Calibri", 10),
-                                            bg='#2B2A33', fg='white', anchor='center')
+                                        bg='#2B2A33', fg='white', anchor='center')
         snack_quantity_label.grid(row=index, column=1, pady=5, padx=5)
 
         snack_price = "Precio: $" + str(snack[2])
         snack_price_label = tk.Label(snacks_canvas, text=snack_price, font=("Calibri", 10),
-                                       bg='#2B2A33', fg='white', anchor='center')
+                                     bg='#2B2A33', fg='white', anchor='center')
         snack_price_label.pack(pady=5)
 
         total_snacks += snack[2]
-        index +=1
+        index += 1
 
     title_total_snacks = "TOTAL SNACKS: $" + str(int(total_snacks))
     title_total_snacks_label = tk.Label(snacks_frame, text=title_total_snacks, font=("Calibri", 12, "bold"),
-                                   bg='black', fg='white', anchor='center')
+                                        bg='black', fg='white', anchor='center')
     title_total_snacks_label.grid(row=index, column=1, pady=5)
 
     snacks_canvas.update_idletasks()  # Update the canvas
@@ -689,7 +688,7 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
     total = total_tickets + total_snacks
     total_text = ' TOTAL: $' + str(int(total))
     total_label = tk.Label(window, text=total_text, font=("Calibri", 25, "bold"), bg='black', fg='white',
-                            anchor='center')
+                           anchor='center')
     total_label.pack(pady=25)
 
     pay_button = tk.Button(window, text="PAGAR", command=lambda: payment_window(window, sale))
