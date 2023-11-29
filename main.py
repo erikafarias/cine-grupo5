@@ -182,35 +182,37 @@ def show_movie_info(movie: dict, window: tk) -> None:
 
     button_movie = tk.Button(frame_movie, image=poster, bg='#2B2A33')
     button_movie.image = poster  # to prevent garbage collection
-    button_movie.pack()
+    button_movie.pack(side='left')
 
+    movie_info_frame = tk.Frame(frame_movie, bg='#2B2A33')
     movie_name = movie['name']
-    movie_name_label = tk.Label(window, text=movie_name, font=('Calibri', 18, "bold"), bg='#2B2A33',
+    movie_name_label = tk.Label(movie_info_frame, text=movie_name, font=('Calibri', 18, "bold"), bg='#2B2A33',
                                fg='#FFFFFF', anchor='center')
     movie_name_label.pack(pady=(30, 10))
 
     synopsis = movie['synopsis']
-    synopsis_label = tk.Label(window, text=synopsis, font=('Calibri', 10, 'italic'), bg='#2B2A33', fg='#FFFFFF',
+    synopsis_label = tk.Label(movie_info_frame, text=synopsis, font=('Calibri', 10, 'italic'), bg='#2B2A33', fg='#FFFFFF',
                         wraplength=600, justify='center')
     synopsis_label.pack(pady=5)
 
     duration = movie['duration']
-    duration_label = tk.Label(window, text=duration, font=('Calibri', 10), bg='#2B2A33', fg='#FFFFFF', anchor='center')
+    duration_label = tk.Label(movie_info_frame, text=duration, font=('Calibri', 10), bg='#2B2A33', fg='#FFFFFF', anchor='center')
     duration_label.pack(pady=5)
 
     actors = movie['actors']
-    actors_label = tk.Label(window, text=actors, font=('Calibri', 10), bg='#2B2A33', fg='#FFFFFF', anchor='center')
+    actors_label = tk.Label(movie_info_frame, text=actors, font=('Calibri', 10), bg='#2B2A33', fg='#FFFFFF', anchor='center')
     actors_label.pack(pady=5)
 
     genre = movie['gender']
-    genre_label = tk.Label(window, text=genre, font=('Calibri', 10, 'bold'), bg='#2B2A33', fg='#FFFFFF',
+    genre_label = tk.Label(movie_info_frame, text=genre, font=('Calibri', 10, 'bold'), bg='#2B2A33', fg='#FFFFFF',
                       anchor='center')
     genre_label.pack(pady=5)
 
     rating = movie['rating']
-    rating_label = tk.Label(window, text=rating, font=('Calibri', 10, 'bold'), bg='#2B2A33', fg='#FFFFFF',
+    rating_label = tk.Label(movie_info_frame, text=rating, font=('Calibri', 10, 'bold'), bg='#2B2A33', fg='#FFFFFF',
                       anchor='center')
     rating_label.pack(pady=5)
+    movie_info_frame.pack(side='right')
 
 
 def show_room_with_seats(cinema: dict, window: tk, sale: dict) -> None:
