@@ -223,7 +223,8 @@ def show_room_with_seats(cinema: dict, window: tk, sale: dict) -> None:
 
     if cinema['available_seats'] > 0:
 
-        button_book = tk.Button(window, text="RESERVAR", command=lambda: reservation_window(sale, window))
+        available_seats = int(cinema['available_seats'])
+        button_book = tk.Button(window, text="RESERVAR", command=lambda: reservation_window(sale, window,available_seats))
         button_book.configure(
             relief=tk.RAISED,
             bd=3,
@@ -326,7 +327,7 @@ def ticket_confirm(dict_cart, number_box, price, final_price_ticket) -> None:
     dict_cart['Asientos'] = (number_tickets, final_price_ticket)
 
 
-def reservation_window(sale: dict, window: tk) -> None:
+def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
     window.withdraw()
 
     window1 = tk.Tk()
@@ -373,7 +374,7 @@ def reservation_window(sale: dict, window: tk) -> None:
     number_box = tk.Spinbox(
         window1,
         from_=0,
-        to=20,
+        to=available_seats,
         textvariable=current_value,
         wrap=True,
         state="readonly",
