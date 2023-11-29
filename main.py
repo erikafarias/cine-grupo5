@@ -621,8 +621,8 @@ def button_pay(sale: dict, window2: tk, dict_qr, card_number_input, expiry_input
 
     else:
         locale.setlocale(locale.LC_ALL, '')
-        fecha_actual = datetime.datetime.now()
-        timestamp_sale = fecha_actual.strftime('%d/%m/%Y %H:%M')
+        date = datetime.datetime.now()
+        timestamp_sale = date.strftime('%d/%m/%Y %H:%M')
 
         sale['timestamp_sale'] = timestamp_sale
 
@@ -656,11 +656,11 @@ def button_pay(sale: dict, window2: tk, dict_qr, card_number_input, expiry_input
 
         messagebox.showinfo(message=f"Tu ID de sale es: {id_qr}", title="ID de sale")
 
-        window2.withdraw()  # cierra esta ventana
+        window2.withdraw()
 
 
 def payment_window(window: tk, sale: dict) -> None:
-    window.withdraw()  # cierra la primera ventana
+    window.withdraw()
 
     window2 = tk.Tk()
     window2.geometry("500x500")
@@ -670,11 +670,11 @@ def payment_window(window: tk, sale: dict) -> None:
 
     font_type = 'Calibri'
 
-    # metodos de pago
+
     payment_methods_label = tk.Label(window2, text='Metodos de pago', font=(font_type, 18), bg='#2b2a33', fg='#ffffff')
     payment_methods_label.place(x=160, y=50)
 
-    payment_methods_list: list = ['Visa', 'Amex', 'MasteCard', 'Naranja', 'Cabal']
+    payment_methods_list: list = ['Visa', 'Amex', 'MasterCard', 'Naranja', 'Cabal']
     current_var = tk.StringVar()
     payment_methods = ttk.Combobox(
         window2,
@@ -687,7 +687,6 @@ def payment_window(window: tk, sale: dict) -> None:
 
     payment_methods.place(x=170, y=100)
 
-    # inputs numero y codigo de seguridad de la tajeta
 
     card_number_label = tk.Label(window2, text="Numero de tarjeta", bg='#2b2a33', fg='#ffffff', font=(font_type, 18))
     card_number_label.place(x=160, y=150)
@@ -711,7 +710,6 @@ def payment_window(window: tk, sale: dict) -> None:
     expiry_input.place(x=350, y=300)
     expiry_input.insert(0, "MM/AA")
 
-    # boton de pago
     dict_qr: dict = {}  # diccio solo para generar el qr
     pay_button = tk.Button(
         window2, text='Pagar',
@@ -740,8 +738,6 @@ def main() -> None:
     WINDOW.withdraw()
 
     principal_window(sale)
-
-    # WINDOW.mainloop()
 
 
 main()
