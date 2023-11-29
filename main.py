@@ -7,7 +7,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 import qrcode  # pip install qrcode
-from PIL import ImageTk
+from PIL import ImageTk, Image
 
 import endpoints
 from utils import decodificar_imagen_base64
@@ -358,7 +358,7 @@ def reservation_window(sale: dict, window: tk) -> None:
     # titulo secundario asientos
     second_title = tk.Label(
         window1,
-        text="¡Seleccione numero de asientos!",
+        text="Cantidad de entradas",
         font=(font_type, 18),
         width=30,
         height=2,
@@ -401,7 +401,7 @@ def reservation_window(sale: dict, window: tk) -> None:
     # boton confirmar aisnetos
     confirm_tickets = tk.Button(
         window1,
-        text="Confirmar Asientos",
+        text="Confirmar entradas",
         font=(font_type, 18),
         command=lambda: ticket_confirm(dict_cart, number_box, price, final_price_ticket)
     )
@@ -411,7 +411,7 @@ def reservation_window(sale: dict, window: tk) -> None:
     # tercer titulo snacks
     tird_title = tk.Label(
         window1,
-        text="¡Agregue Snacks Aqui!",
+        text="Agregar Snacks",
         font=(font_type, 18),
         width=30,
         height=2,
@@ -611,6 +611,16 @@ def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks:
     pay_button.pack(pady=15)
 
 
+def generate_QR_pdf(info: str) -> None:
+    img_qr = qrcode.make(info)
+    type(img_qr)
+    img_qr.save("QR_GENERADO.png")
+
+    with open('QR_generado.pdf', 'wb') as pdf_file:
+        qr_image = Image.open("QR_GENERADO.png")
+        qr_image.save(pdf_file, "pdf")
+
+
 def button_pay(sale: dict, window2: tk, dict_qr, card_number_input, expiry_input, security_code_input) -> None:
     card_number = str(card_number_input.get())
     expiry = str(expiry_input.get())
@@ -640,9 +650,7 @@ def button_pay(sale: dict, window2: tk, dict_qr, card_number_input, expiry_input
 
         string_qr = f'{id_qr}; {sale["nombre_pelicula"]}; {sale["ubicacion_totem"]}; {sale["cantidad_entradas"]}; {sale["timestamp_sale"]}; {final_price_}'
 
-        img = qrcode.make(string_qr)
-        type(img)
-        img.save("QR_GENERADO.png")
+        generate_QR_pdf(string_qr)
 
         dict_ID_QR: dict = {f'{id_qr}': [f'{id_qr}', f'{sale["nombre_pelicula"]}', f'{sale["ubicacion_totem"]}',
                                          f'{sale["cantidad_entradas"]}', f'{sale["timestamp_sale"]}',
