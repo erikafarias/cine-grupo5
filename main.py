@@ -422,7 +422,7 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
 
     price = float(sale['precio_entrada'])
     list_names_snacks, list_prices_snacks, list_ult, stock_of_snacks = endpoints.get_stock_snacks()
-    dict_cart: dict = {'Asientos': [0, price]}
+    dict_cart: dict = {'Asientos': (0, 0)}
 
     title = tk.Label(
         window1,
@@ -569,22 +569,21 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
         padx=5,
         pady=5,
         text="Checkout/Pagar",
-        command=lambda: checkout_window(window1, sale, dict_cart, list_names_snacks, number_box)
+        command=lambda: checkout_window(window1, sale, dict_cart, list_names_snacks)
     )
     final_button.place(x=550, y=600)
 
     window1.mainloop()
 
 
-def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks: list, number_box) -> None:
+def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks: list) -> None:
     """
     Método encargado de mostrar los artículos del carrito antes de pagarlos
 
     Method responsible for showing the items in the cart before the paying stage
     """
-    seats = int(number_box.get())
 
-    if seats == 0 or dict_cart['Asientos'] == False:
+    if dict_cart['Asientos'] == (0,0):
         messagebox.showinfo(message="Verifique el numero de asientos, asegúrese de confirmar", title="Error en los asientos")
     else:
         window1.withdraw()
