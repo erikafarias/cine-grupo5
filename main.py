@@ -422,7 +422,7 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
 
     price = float(sale['precio_entrada'])
     list_names_snacks, list_prices_snacks, list_ult, stock_of_snacks = endpoints.get_stock_snacks()
-    dict_cart: dict = {'Asientos': 0}
+    dict_cart: dict = {'Asientos': [0, price]}
 
     title = tk.Label(
         window1,
