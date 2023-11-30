@@ -397,6 +397,7 @@ def ticket_confirm(dict_cart, number_box, price, text_value_2) -> None:
 
     Method responsible for adding to the cart the number of tickets selected
     """
+
     number_tickets = int(number_box.get())
     final_price_ticket = (number_tickets * price)
     dict_cart['Asientos'] = (number_tickets, final_price_ticket)
@@ -421,7 +422,7 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
 
     price = float(sale['precio_entrada'])
     list_names_snacks, list_prices_snacks, list_ult, stock_of_snacks = endpoints.get_stock_snacks()
-    dict_cart: dict = {'Asientos': 1}
+    dict_cart: dict = {'Asientos': 0}
 
     title = tk.Label(
         window1,
@@ -450,7 +451,7 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
     current_value = tk.IntVar()
     number_box = tk.Spinbox(
         window1,
-        from_=1,
+        from_=0,
         to=available_seats,
         textvariable=current_value,
         wrap=True,
@@ -568,140 +569,145 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
         padx=5,
         pady=5,
         text="Checkout/Pagar",
-        command=lambda: checkout_window(window1, sale, dict_cart, list_names_snacks)
+        command=lambda: checkout_window(window1, sale, dict_cart, list_names_snacks, number_box)
     )
     final_button.place(x=550, y=600)
 
     window1.mainloop()
 
 
-def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks: list) -> None:
+def checkout_window(window1: tk, sale: dict, dict_cart: dict, list_names_snacks: list, number_box) -> None:
     """
     Método encargado de mostrar los artículos del carrito antes de pagarlos
 
     Method responsible for showing the items in the cart before the paying stage
     """
-    window1.withdraw()
+    seats = int(number_box.get())
 
-    sale['cantidad_entradas'] = dict_cart['Asientos'][0]
+    if seats == 0 or dict_cart['Asientos'] == False:
+        messagebox.showinfo(message="Verifique el numero de asientos, asegúrese de confirmar", title="Error en los asientos")
+    else:
+        window1.withdraw()
 
-    for snack in list_names_snacks:
-        if snack in dict_cart:
-            sale['snacks'] += [[snack, dict_cart[snack][0], dict_cart[snack][1]]]
+        sale['cantidad_entradas'] = dict_cart['Asientos'][0]
 
-    total_snacks: int = 0
+        for snack in list_names_snacks:
+            if snack in dict_cart:
+                sale['snacks'] += [[snack, dict_cart[snack][0], dict_cart[snack][1]]]
 
-    window = tk.Tk(screenName='Pantalla Checkout')
-    window.geometry("1280x720")
-    window.configure(bg='#2B2A33')
-    window.title('>>> CHECKOUT')
+        total_snacks: int = 0
 
-    title = ' 🛒 '
-    title_label = tk.Label(window, text=title, font=("Calibri", 50, "bold"), bg='#2B2A33', fg='white',
-                           anchor='center')
-    title_label.pack(pady=15)
-    title_2 = ' RESUMEN DE COMPRA '
-    title_2_label = tk.Label(window, text=title_2, font=("Calibri", 30, "bold"), bg='#2B2A33', fg='white',
-                             anchor='center')
-    title_2_label.pack(pady=15)
+        window = tk.Tk(screenName='Pantalla Checkout')
+        window.geometry("1280x720")
+        window.configure(bg='#2B2A33')
+        window.title('>>> CHECKOUT')
 
-    canvas = tk.Canvas(window, bg='#2B2A33', highlightbackground='#2B2A33')
-    canvas.pack(fill='both', padx=60, pady=30)
+        title = ' 🛒 '
+        title_label = tk.Label(window, text=title, font=("Calibri", 50, "bold"), bg='#2B2A33', fg='white',
+                            anchor='center')
+        title_label.pack(pady=15)
+        title_2 = ' RESUMEN DE COMPRA '
+        title_2_label = tk.Label(window, text=title_2, font=("Calibri", 30, "bold"), bg='#2B2A33', fg='white',
+                                anchor='center')
+        title_2_label.pack(pady=15)
 
-    # Tickets
-    tickets_canvas = tk.Canvas(canvas, bg='#2B2A33', highlightthickness=0)
-    tickets_canvas.pack(side=tk.LEFT, expand=1, fill=tk.BOTH, pady=15)
+        canvas = tk.Canvas(window, bg='#2B2A33', highlightbackground='#2B2A33')
+        canvas.pack(fill='both', padx=60, pady=30)
 
-    tickets_frame = tk.Frame(tickets_canvas, bg='#2B2A33', highlightbackground='#2B2A33')
-    tickets_frame.pack(fill='both')
+        # Tickets
+        tickets_canvas = tk.Canvas(canvas, bg='#2B2A33', highlightthickness=0)
+        tickets_canvas.pack(side=tk.LEFT, expand=1, fill=tk.BOTH, pady=15)
 
-    title_tickets = ' ENTRADAS '
-    title_tickets_label = tk.Label(tickets_frame, text=title_tickets, font=("Calibri", 20, "bold"), bg='white',
-                                   fg='black', anchor='center')
-    title_tickets_label.pack(pady=20)
-    movie_title = sale['nombre_pelicula']
-    movie_title_label = tk.Label(tickets_frame, text=movie_title, font=("Calibri", 15, "bold"), bg='#2B2A33',
-                                 fg='white', anchor='center')
-    movie_title_label.pack(pady=5)
-    number_of_tickets = "- Entradas: " + str(sale['cantidad_entradas'])
-    number_of_tickets_label = tk.Label(tickets_frame, text=number_of_tickets, font=("Calibri", 10),
-                                       bg='#2B2A33', fg='white', anchor='center')
-    number_of_tickets_label.pack(pady=5)
-    title_tickets_price = "- Precio Unitario: $" + str(sale['precio_entrada'])
-    title_tickets_price_label = tk.Label(tickets_frame, text=title_tickets_price, font=("Calibri", 10),
-                                         bg='#2B2A33', fg='white', anchor='center')
-    title_tickets_price_label.pack(pady=5)
+        tickets_frame = tk.Frame(tickets_canvas, bg='#2B2A33', highlightbackground='#2B2A33')
+        tickets_frame.pack(fill='both')
 
-    total_tickets: float = sale['cantidad_entradas'] * sale['precio_entrada']
-
-    title_total_tickets = "TOTAL ENTRADAS: $" + str(total_tickets)
-    title_total_tickets_label = tk.Label(tickets_frame, text=title_total_tickets, font=("Calibri", 12, "bold"),
-                                         bg='black', fg='white', anchor='center')
-    title_total_tickets_label.pack(pady=(10, 25))
-
-    # Snacks
-    snacks_canvas = tk.Canvas(canvas, bg='#2B2A33', highlightthickness=0)
-    snacks_canvas.pack(side=tk.LEFT, expand=1, fill=tk.BOTH, pady=15)
-
-    scrollbar = tk.Scrollbar(snacks_canvas, orient="vertical", bg='#2B2A33', command=snacks_canvas.yview)
-    scrollbar.pack(side='right', fill='y')
-    snacks_canvas.configure(yscrollcommand=scrollbar.set)
-
-    snacks_frame = tk.Frame(snacks_canvas, bg='#2B2A33', highlightbackground='#2B2A33')
-    snacks_frame.pack(fill='both')
-    snacks_canvas.create_window((20, 20), window=snacks_frame, anchor='n')
-
-    title_snacks = ' SNACKS '
-    title_snacks_label = tk.Label(snacks_frame, text=title_snacks, font=("Calibri", 20, "bold"), bg='white',
-                                  fg='black', anchor='center')
-    title_snacks_label.grid(row=0, column=1, pady=20)
-
-    index: int = 1
-
-    for snack in sale['snacks']:
-        snack_name = "+ " + snack[0]
-        snack_name_label = tk.Label(snacks_frame, text=snack_name, font=("Calibri", 15, "bold"),
-                                    bg='#2B2A33', fg='white', anchor='center')
-        snack_name_label.grid(row=index, column=0, pady=10, padx=5)
-
-        snack_quantity = "Cantidad: " + str(snack[1])
-        snack_quantity_label = tk.Label(snacks_frame, text=snack_quantity, font=("Calibri", 10),
+        title_tickets = ' ENTRADAS '
+        title_tickets_label = tk.Label(tickets_frame, text=title_tickets, font=("Calibri", 20, "bold"), bg='white',
+                                    fg='black', anchor='center')
+        title_tickets_label.pack(pady=20)
+        movie_title = sale['nombre_pelicula']
+        movie_title_label = tk.Label(tickets_frame, text=movie_title, font=("Calibri", 15, "bold"), bg='#2B2A33',
+                                    fg='white', anchor='center')
+        movie_title_label.pack(pady=5)
+        number_of_tickets = "- Entradas: " + str(sale['cantidad_entradas'])
+        number_of_tickets_label = tk.Label(tickets_frame, text=number_of_tickets, font=("Calibri", 10),
                                         bg='#2B2A33', fg='white', anchor='center')
-        snack_quantity_label.grid(row=index, column=1, pady=5, padx=5)
+        number_of_tickets_label.pack(pady=5)
+        title_tickets_price = "- Precio Unitario: $" + str(sale['precio_entrada'])
+        title_tickets_price_label = tk.Label(tickets_frame, text=title_tickets_price, font=("Calibri", 10),
+                                            bg='#2B2A33', fg='white', anchor='center')
+        title_tickets_price_label.pack(pady=5)
 
-        snack_price = "Precio: $" + str(snack[2])
-        snack_price_label = tk.Label(snacks_frame, text=snack_price, font=("Calibri", 10),
-                                     bg='#2B2A33', fg='white', anchor='center')
-        snack_price_label.grid(row=index, column=2, pady=5, padx=5)
+        total_tickets: float = sale['cantidad_entradas'] * sale['precio_entrada']
 
-        total_snacks += snack[2]
-        index += 1
+        title_total_tickets = "TOTAL ENTRADAS: $" + str(total_tickets)
+        title_total_tickets_label = tk.Label(tickets_frame, text=title_total_tickets, font=("Calibri", 12, "bold"),
+                                            bg='black', fg='white', anchor='center')
+        title_total_tickets_label.pack(pady=(10, 25))
 
-    title_total_snacks = "TOTAL SNACKS: $" + str(int(total_snacks))
-    title_total_snacks_label = tk.Label(snacks_frame, text=title_total_snacks, font=("Calibri", 12, "bold"),
-                                        bg='black', fg='white', anchor='center')
-    title_total_snacks_label.grid(row=index, column=1, pady=5)
+        # Snacks
+        snacks_canvas = tk.Canvas(canvas, bg='#2B2A33', highlightthickness=0)
+        snacks_canvas.pack(side=tk.LEFT, expand=1, fill=tk.BOTH, pady=15)
 
-    snacks_canvas.update_idletasks()  # Update the canvas
-    snacks_canvas.config(scrollregion=snacks_canvas.bbox('all'))
+        scrollbar = tk.Scrollbar(snacks_canvas, orient="vertical", bg='#2B2A33', command=snacks_canvas.yview)
+        scrollbar.pack(side='right', fill='y')
+        snacks_canvas.configure(yscrollcommand=scrollbar.set)
 
-    total = total_tickets + total_snacks
-    total_text = ' TOTAL: $' + str(int(total))
-    total_label = tk.Label(window, text=total_text, font=("Calibri", 25, "bold"), bg='black', fg='white',
-                           anchor='center')
-    total_label.pack(pady=25)
+        snacks_frame = tk.Frame(snacks_canvas, bg='#2B2A33', highlightbackground='#2B2A33')
+        snacks_frame.pack(fill='both')
+        snacks_canvas.create_window((20, 20), window=snacks_frame, anchor='n')
 
-    pay_button = tk.Button(window, text="PAGAR", command=lambda: payment_window(window, sale))
-    pay_button.configure(
-        relief=tk.RAISED,
-        bd=3,
-        font=('Calibri', 15, 'bold'),
-        foreground='white',
-        background='grey',
-        padx=20,
-        pady=5,
-    )
-    pay_button.pack(pady=10)
+        title_snacks = ' SNACKS '
+        title_snacks_label = tk.Label(snacks_frame, text=title_snacks, font=("Calibri", 20, "bold"), bg='white',
+                                    fg='black', anchor='center')
+        title_snacks_label.grid(row=0, column=1, pady=20)
+
+        index: int = 1
+
+        for snack in sale['snacks']:
+            snack_name = "+ " + snack[0]
+            snack_name_label = tk.Label(snacks_frame, text=snack_name, font=("Calibri", 15, "bold"),
+                                        bg='#2B2A33', fg='white', anchor='center')
+            snack_name_label.grid(row=index, column=0, pady=10, padx=5)
+
+            snack_quantity = "Cantidad: " + str(snack[1])
+            snack_quantity_label = tk.Label(snacks_frame, text=snack_quantity, font=("Calibri", 10),
+                                            bg='#2B2A33', fg='white', anchor='center')
+            snack_quantity_label.grid(row=index, column=1, pady=5, padx=5)
+
+            snack_price = "Precio: $" + str(snack[2])
+            snack_price_label = tk.Label(snacks_frame, text=snack_price, font=("Calibri", 10),
+                                        bg='#2B2A33', fg='white', anchor='center')
+            snack_price_label.grid(row=index, column=2, pady=5, padx=5)
+
+            total_snacks += snack[2]
+            index += 1
+
+        title_total_snacks = "TOTAL SNACKS: $" + str(int(total_snacks))
+        title_total_snacks_label = tk.Label(snacks_frame, text=title_total_snacks, font=("Calibri", 12, "bold"),
+                                            bg='black', fg='white', anchor='center')
+        title_total_snacks_label.grid(row=index, column=1, pady=5)
+
+        snacks_canvas.update_idletasks()  # Update the canvas
+        snacks_canvas.config(scrollregion=snacks_canvas.bbox('all'))
+
+        total = total_tickets + total_snacks
+        total_text = ' TOTAL: $' + str(int(total))
+        total_label = tk.Label(window, text=total_text, font=("Calibri", 25, "bold"), bg='black', fg='white',
+                            anchor='center')
+        total_label.pack(pady=25)
+
+        pay_button = tk.Button(window, text="PAGAR", command=lambda: payment_window(window, sale))
+        pay_button.configure(
+            relief=tk.RAISED,
+            bd=3,
+            font=('Calibri', 15, 'bold'),
+            foreground='white',
+            background='grey',
+            padx=20,
+            pady=5,
+        )
+        pay_button.pack(pady=10)
 
 
 def generate_QR_pdf(info: str) -> None:
@@ -754,7 +760,7 @@ def qr_window(window, id_qr) -> None:
     image_label.image = image_qr
     image_label.pack()
     button_main = tk.Button(window2, text='Volver a la cartelera', font=("Calibri", 14), bg='#2b2a33', fg='white',
-                            pady=0, highlightbackground='#2b2a33', command=lambda: [window2.withdraw(), principal_window(sale)])
+                            pady=0, highlightbackground='#2b2a33', command=lambda: [window.withdraw(), principal_window(sale)])
     button_main.pack(pady=10)
 
     window2.mainloop()
