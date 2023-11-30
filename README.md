@@ -16,7 +16,7 @@ Consiste en dos aplicaciones, la primera es una aplicación gráfica GUI utiliza
 
 <h2>📚 Documentacion:</h2>
 
-- <a href="https://github.com/erikafarias/cine-grupo5/blob/main/documentation/TP_GRUPO5.pdf"> DOCUMENTACION</a>
+- <a href="https://github.com/erikafarias/cine-grupo5/blob/main/documentation/TP2_GRUPO5.pdf"> DOCUMENTACION</a>
 
 <h2>🚀 Como correr la aplicacion:</h2>
 
