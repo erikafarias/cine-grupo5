@@ -421,7 +421,7 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
 
     price = float(sale['precio_entrada'])
     list_names_snacks, list_prices_snacks, list_ult, stock_of_snacks = endpoints.get_stock_snacks()
-    dict_cart: dict = {}
+    dict_cart: dict = {'Asientos': 1}
 
     title = tk.Label(
         window1,
@@ -450,7 +450,7 @@ def reservation_window(sale: dict, window: tk, available_seats: int) -> None:
     current_value = tk.IntVar()
     number_box = tk.Spinbox(
         window1,
-        from_=0,
+        from_=1,
         to=available_seats,
         textvariable=current_value,
         wrap=True,
@@ -720,6 +720,46 @@ def generate_QR_pdf(info: str) -> None:
         qr_image.save(pdf_file, "pdf")
 
 
+def qr_window(window, id_qr) -> None:
+    """
+    Método encargado de mostrar el QR generado y la opción para volver a la pantalla principal
+
+    Method responsible for displaying the generated QR and an option to go back to the main window
+    """
+    sale: dict = {
+        'ID_QR': '',
+        'ID_pelicula': '',
+        'nombre_pelicula': '',
+        'ID_cinema': '',
+        'ubicacion_totem': '',
+        'cantidad_entradas': 0,
+        'precio_entrada': 3000,
+        'snacks': [],
+        'timestamp_sale': ''
+    }
+
+    window.withdraw()
+    window2 = tk.Toplevel()
+    window2.geometry("500x600")
+    window2.title('Final de compra')
+    window2.configure(bg='#2b2a33')
+
+    title_label = tk.Label(window2, text=f'Gracias por su compra: {id_qr}', font=("Calibri", 20, "bold"), bg='#2b2a33', fg='white')
+    title_label.pack(pady=5)
+    title_label = tk.Label(window2, text='QR GENERADO', font=("Calibri", 18, "bold"), bg='#2b2a33', fg='white')
+    title_label.pack(pady=5)
+    image = Image.open('QR_GENERADO.png')
+    image_qr = ImageTk.PhotoImage(image)
+    image_label = tk.Label(window2, image=image_qr)
+    image_label.image = image_qr
+    image_label.pack()
+    button_main = tk.Button(window2, text='Volver a la cartelera', font=("Calibri", 14), bg='#2b2a33', fg='white',
+                            pady=0, highlightbackground='#2b2a33', command=lambda: [window.withdraw(), principal_window(sale)])
+    button_main.pack(pady=10)
+
+    window2.mainloop()
+
+
 def button_pay(sale: dict, window2: tk, card_number_input, expiry_input, security_code_input) -> None:
     """
     Dados los datos del medio de pago, los valida y si son correctos finaliza la compra
@@ -768,7 +808,8 @@ def button_pay(sale: dict, window2: tk, card_number_input, expiry_input, securit
         with open('IDs_QR.json', 'w') as outfile:
             json.dump(data, outfile, indent=4)
 
-        messagebox.showinfo(message=f"Tu ID de sale es: {id_qr}", title="ID de sale")
+        messagebox.showinfo(message=f"Tu ID de compra es: {id_qr}", title="ID de sale")
+        qr_window(window2, id_qr)
 
         window2.withdraw()
 
