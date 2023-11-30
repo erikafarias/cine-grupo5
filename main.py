@@ -760,7 +760,7 @@ def qr_window(window, id_qr) -> None:
     image_label.image = image_qr
     image_label.pack()
     button_main = tk.Button(window2, text='Volver a la cartelera', font=("Calibri", 14), bg='#2b2a33', fg='white',
-                            pady=0, highlightbackground='#2b2a33', command=lambda: [window.withdraw(), principal_window(sale)])
+                            pady=0, highlightbackground='#2b2a33', command=lambda: [window2.withdraw(), principal_window(sale)])
     button_main.pack(pady=10)
 
     window2.mainloop()
